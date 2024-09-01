@@ -15,7 +15,7 @@ install-extension: build-extension ## Install the extension
 update-extension: build-extension ## Update the extension
 	docker extension update $(IMAGE):$(TAG)
 
-start-dev-attach-localhost:
+attach-localhost:
 	make update-extension
 	docker extension dev ui-source $(IMAGE):$(TAG) http://localhost:3000
 	docker extension dev debug $(IMAGE):$(TAG)

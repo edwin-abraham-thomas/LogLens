@@ -8,7 +8,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
 import { SyntheticEvent, useState } from "react";
 import IconButton from "@mui/material/IconButton";
-import { FilterList } from '@mui/icons-material';
 
 type Props = {
   containers: Container[];
@@ -32,9 +31,6 @@ export function Containers({ containers }: Props) {
 
   return (
     <>
-      <IconButton aria-label="filter">
-        <FilterList />
-      </IconButton>
       <Box
         sx={{
           width: "100%",
