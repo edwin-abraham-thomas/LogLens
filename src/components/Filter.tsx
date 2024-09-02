@@ -9,7 +9,7 @@ import { FilterCriteria } from "../interfaces/filterCriteria";
 
 const modalStyle = {
   width: 600,
-  paddingLeft: "1rem",
+  padding: "1rem",
   bgcolor: "background.paper",
 };
 
@@ -37,6 +37,7 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
   useEffect(() => {
     setFilterCriteria({
       selectedContainerIds: selectedContainers,
+      stream: "stdout"
     });
   }, [selectedContainers]);
 
