@@ -6,15 +6,14 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
-import { SyntheticEvent, useState } from "react";
-import IconButton from "@mui/material/IconButton";
 
 type Props = {
   containers: Container[];
+  selectedContainers: string[]
+  setselectedContainers: (containerIds: string[]) => void
 };
 
-export function Containers({ containers }: Props) {
-  const [selectedContainers, setselectedContainers] = useState<string[]>([]);
+export function Containers({ containers, setselectedContainers, selectedContainers }: Props) {
 
   const handleOnCheck = (containerId: string) => {
     const currentIndex = selectedContainers.indexOf(containerId);

@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
-import { Container } from "./interfaces/container";
-import { Containers } from "./components/Containers";
-import IconButton from "@mui/material/IconButton";
-import { FilterList } from "@mui/icons-material";
 import Divider from "@mui/material/Divider";
 import "./styles.css";
+import { Filter } from "./components/Filter";
+import { useEffect, useState } from "react";
+import { FilterCriteria } from "./interfaces/filterCriteria";
 
-// Note: This line relies on Docker Desktop's presence as a host application.
-// If you're running this React app in a browser, it won't work properly.
 const client = createDockerDesktopClient();
 
 function useDockerDesktopClient() {
@@ -16,30 +12,21 @@ function useDockerDesktopClient() {
 }
 
 export function App() {
-  const [containers, setContainers] = useState<Container[]>([]);
+  
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>();
 
   useEffect(() => {
-    const ddClient = useDockerDesktopClient();
-
-    setInterval(() => {
-      ddClient.docker.listContainers().then((fetchedContainers) => {
-        setContainers(fetchedContainers as Container[]);
-      });
-    }, 1000);
-  }, []);
+    console.log('Filter Criteria: ', filterCriteria);
+  }, [filterCriteria])
 
   return (
     <>
       <div className="flex">
         <h1>Logs Watch</h1>
         <div className="spacer"></div>
-        <IconButton aria-label="filter">
-          <FilterList />
-        </IconButton>
+        <Filter ddClient={useDockerDesktopClient()} setFilterCriteria={setFilterCriteria}></Filter>
       </div>
       <Divider />
-
-      <Containers containers={containers}></Containers>
     </>
   );
 }
