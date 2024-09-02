@@ -1,0 +1,11 @@
+.flex {
+    display: flex;
+}
+
+.spacer {
+    flex: 1 1 auto;
+  }
+
+h1 {
+    margin: 0;
+}

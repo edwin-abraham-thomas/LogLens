@@ -5,6 +5,7 @@ import { Containers } from "./components/Containers";
 import IconButton from "@mui/material/IconButton";
 import { FilterList } from "@mui/icons-material";
 import Divider from "@mui/material/Divider";
+import "./styles.css";
 
 // Note: This line relies on Docker Desktop's presence as a host application.
 // If you're running this React app in a browser, it won't work properly.
@@ -29,13 +30,14 @@ export function App() {
 
   return (
     <>
-      <div>
+      <div className="flex">
         <h1>Logs Watch</h1>
+        <div className="spacer"></div>
         <IconButton aria-label="filter">
           <FilterList />
         </IconButton>
-        <Divider />
       </div>
+      <Divider />
 
       <Containers containers={containers}></Containers>
     </>
