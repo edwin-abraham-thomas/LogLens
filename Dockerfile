@@ -24,5 +24,5 @@ LABEL org.opencontainers.image.title="My extension" \
     com.docker.extension.additional-urls="" \
     com.docker.extension.changelog=""
 COPY metadata.json .
-COPY docker.svg .
+COPY loglens.svg .
 COPY --from=client-builder /ui/build ui
