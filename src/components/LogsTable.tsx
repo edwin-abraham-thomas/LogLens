@@ -20,7 +20,7 @@ export function LogsTable({ logs }: prop) {
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: "17rem" }}>TimeStamp</TableCell>
+              <TableCell sx={{ minWidth: "17rem" }}>TimeStamp</TableCell>
               <TableCell>Message</TableCell>
             </TableRow>
           </TableHead>
