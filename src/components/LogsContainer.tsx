@@ -6,6 +6,7 @@ import { FilterCriteria } from "../interfaces/filterCriteria";
 import { useEffect, useState } from "react";
 import { Log } from "../interfaces/Log";
 import { Container } from "../interfaces/container";
+import { LogsTable } from "./LogsTable";
 
 type prop = {
   ddClient: DockerDesktopClient;
@@ -59,7 +60,7 @@ export function LogsContainer({ ddClient, filterCriteria }: prop) {
 
   return (
     <>
-      <pre>{JSON.stringify(logs, null, 2)}</pre>
+      <LogsTable logs={logs} />
     </>
   );
 }
