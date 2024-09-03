@@ -5,6 +5,7 @@ import { Filter } from "./components/Filter";
 import { useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { LogsContainer } from "./components/LogsContainer";
+import { Typography } from "@mui/material";
 
 const client = createDockerDesktopClient();
 
@@ -18,7 +19,7 @@ export function App() {
   return (
     <>
       <div className="flex items-center">
-        <h2 className="app-header">Logs Watch</h2>
+        <Typography variant="h2">Logs Watch</Typography>
         <div className="spacer"></div>
         <Filter
           ddClient={useDockerDesktopClient()}

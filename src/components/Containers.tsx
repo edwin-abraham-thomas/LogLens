@@ -41,6 +41,7 @@ export function Containers({ containers, setselectedContainers, selectedContaine
         <List sx={{ bgcolor: "background.paper" }} dense>
           {containers.map((container) => {
             return (
+              <>
               <ListItem key={container.Id}>
                 <ListItemButton onClick={() => handleOnCheck(container.Id)}>
                   <ListItemIcon>
@@ -59,6 +60,7 @@ export function Containers({ containers, setselectedContainers, selectedContaine
                   />
                 </ListItemButton>
               </ListItem>
+              </>
             );
           })}
         </List>

@@ -1,6 +1,6 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
 import { FilterList, Padding } from "@mui/icons-material";
-import { Box, Modal } from "@mui/material";
+import { Box, Modal, Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import { useEffect, useState } from "react";
 import { Container } from "../interfaces/container";
@@ -29,11 +29,10 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
   );
 
   useEffect(() => {
-    setInterval(() => {
-      ddClient.docker.listContainers().then((fetchedContainers) => {
-        setContainers(fetchedContainers as Container[]);
-      });
-    }, 1000);
+
+    ddClient.docker.listContainers().then((fetchedContainers) => {
+      setContainers(fetchedContainers as Container[]);
+    });
   }, []);
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
 
       <Modal className="flex flex-center" open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
-          <h2>Filter</h2>
+          <Typography variant="h3">Filter</Typography>
           <Containers
             containers={containers}
             setselectedContainers={setselectedContainerIds}

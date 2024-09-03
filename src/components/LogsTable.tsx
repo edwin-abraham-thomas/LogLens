@@ -20,18 +20,19 @@ export function LogsTable({ logs }: prop) {
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ minWidth: "17rem" }}>TimeStamp</TableCell>
-              <TableCell>Message</TableCell>
+              <TableCell sx={{ width: "17rem", minWidth: "17rem" }}>
+                Timestamp
+              </TableCell>
+              <TableCell align="left">Message</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {logs.map((log) => (
-              <TableRow>
-                
-              <TableCell component="th" scope="row">
-                {log.timestamp.toUTCString()}
-              </TableCell>
-              <TableCell>{log.log}</TableCell>
+            {logs.map((log, index) => (
+              <TableRow hover key={index}>
+                <TableCell component="th" scope="row">
+                  {log.timestamp.toUTCString()}
+                </TableCell>
+                <TableCell align="left">{log.log}</TableCell>
               </TableRow>
             ))}
           </TableBody>
