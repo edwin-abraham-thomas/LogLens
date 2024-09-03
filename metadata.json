@@ -1,5 +1,5 @@
 {
-  "icon": "docker.svg",
+  "icon": "loglens.svg",
   "ui": {
     "dashboard-tab": {
       "title": "Log Lens",
