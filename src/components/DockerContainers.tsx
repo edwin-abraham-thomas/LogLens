@@ -6,15 +6,19 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Checkbox from "@mui/material/Checkbox";
+import { Typography } from "@mui/material";
 
 type Props = {
   containers: Container[];
-  selectedContainers: string[]
-  setselectedContainers: (containerIds: string[]) => void
+  selectedContainers: string[];
+  setselectedContainers: (containerIds: string[]) => void;
 };
 
-export function Containers({ containers, setselectedContainers, selectedContainers }: Props) {
-
+export function DockerContainers({
+  containers,
+  setselectedContainers,
+  selectedContainers,
+}: Props) {
   const handleOnCheck = (containerId: string) => {
     const currentIndex = selectedContainers.indexOf(containerId);
     const newSelectedContainers = [...selectedContainers];
@@ -30,6 +34,7 @@ export function Containers({ containers, setselectedContainers, selectedContaine
 
   return (
     <>
+      <Typography variant="subtitle1">Containers</Typography>
       <Box
         sx={{
           width: "100%",
@@ -42,24 +47,26 @@ export function Containers({ containers, setselectedContainers, selectedContaine
           {containers.map((container) => {
             return (
               <>
-              <ListItem key={container.Id}>
-                <ListItemButton onClick={() => handleOnCheck(container.Id)}>
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={selectedContainers.indexOf(container.Id) !== -1}
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{ "aria-labelledby": container.Id }}
+                <ListItem key={container.Id}>
+                  <ListItemButton onClick={() => handleOnCheck(container.Id)}>
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={
+                          selectedContainers.indexOf(container.Id) !== -1
+                        }
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ "aria-labelledby": container.Id }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      id={container.Id}
+                      primary={`${container.Names[0].replace(/^\//, "")}`}
+                      secondary={`${container.Image}`}
                     />
-                  </ListItemIcon>
-                  <ListItemText
-                    id={container.Id}
-                    primary={`${container.Names[0].replace(/^\//, '')}`}
-                    secondary={`${container.Image}`}
-                  />
-                </ListItemButton>
-              </ListItem>
+                  </ListItemButton>
+                </ListItem>
               </>
             );
           })}

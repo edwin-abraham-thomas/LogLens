@@ -1,10 +1,25 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
 import { FilterList, Padding } from "@mui/icons-material";
-import { Box, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Modal,
+  Stack,
+  Typography,
+} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import { useEffect, useState } from "react";
 import { Container } from "../interfaces/container";
-import { Containers } from "./Containers";
+import { DockerContainers } from "./DockerContainers";
 import { FilterCriteria } from "../interfaces/filterCriteria";
 
 const modalStyle = {
@@ -16,9 +31,10 @@ const modalStyle = {
 type prop = {
   ddClient: DockerDesktopClient;
   setFilterCriteria: (filterCriteria: FilterCriteria) => void;
+  filterCriteria: FilterCriteria;
 };
 
-export function Filter({ ddClient, setFilterCriteria }: prop) {
+export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -29,7 +45,6 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
   );
 
   useEffect(() => {
-
     ddClient.docker.listContainers().then((fetchedContainers) => {
       setContainers(fetchedContainers as Container[]);
     });
@@ -40,8 +55,8 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
       selectedContainerIds.includes(c.Id)
     );
     setFilterCriteria({
+      ...filterCriteria,
       selectedContainers: selectedContainers,
-      stream: "stdout",
     });
   }, [selectedContainerIds]);
 
@@ -53,14 +68,83 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
 
       <Modal className="flex flex-center" open={open} onClose={handleClose}>
         <Box sx={modalStyle}>
-          <Typography variant="h3">Filter</Typography>
-          <Containers
-            containers={containers}
-            setselectedContainers={setselectedContainerIds}
-            selectedContainers={selectedContainerIds}
-          ></Containers>
+          <Typography sx={{ marginBottom: "2rem" }} variant="h2">
+            Filter
+          </Typography>
+
+          <Stack spacing={3}>
+            <Card>
+              <CardContent>
+                {LogSourceList(filterCriteria, setFilterCriteria)}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent>
+                <DockerContainers
+                  containers={containers}
+                  setselectedContainers={setselectedContainerIds}
+                  selectedContainers={selectedContainerIds}
+                ></DockerContainers>
+              </CardContent>
+            </Card>
+          </Stack>
         </Box>
       </Modal>
+    </>
+  );
+}
+
+function LogSourceList(
+  filterCriteria: FilterCriteria,
+  setFilterCriteria: (filterCriteria: FilterCriteria) => void
+) {
+  return (
+    <>
+      <Typography variant="subtitle1">Source</Typography>
+      <List sx={{ bgcolor: "background.paper" }} dense>
+        <ListItem>
+          <ListItemButton
+            onClick={() =>
+              setFilterCriteria({
+                ...filterCriteria,
+                stdout: !filterCriteria.stdout,
+              })
+            }
+          >
+            <ListItemIcon>
+              <Checkbox
+                edge="start"
+                checked={filterCriteria.stdout}
+                tabIndex={-1}
+                disableRipple
+                inputProps={{ "aria-labelledby": "stdout" }}
+              />
+            </ListItemIcon>
+            <ListItemText id={"stdout"} primary={"stdout"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem>
+          <ListItemButton
+            onClick={() =>
+              setFilterCriteria({
+                ...filterCriteria,
+                stderr: !filterCriteria.stderr,
+              })
+            }
+          >
+            <ListItemIcon>
+              <Checkbox
+                edge="start"
+                checked={filterCriteria.stderr}
+                tabIndex={-1}
+                disableRipple
+                inputProps={{ "aria-labelledby": "stderr" }}
+              />
+            </ListItemIcon>
+            <ListItemText id={"stderr"} primary={"stderr"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
     </>
   );
 }

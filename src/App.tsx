@@ -14,7 +14,11 @@ function useDockerDesktopClient() {
 }
 
 export function App() {
-  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>();
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
+    selectedContainers: [],
+    stderr: false,
+    stdout: false,
+  });
 
   return (
     <>
@@ -24,10 +28,14 @@ export function App() {
         <Filter
           ddClient={useDockerDesktopClient()}
           setFilterCriteria={setFilterCriteria}
+          filterCriteria={filterCriteria}
         />
       </div>
       <Divider />
-      <LogsContainer ddClient={useDockerDesktopClient()} filterCriteria={filterCriteria} />
+      <LogsContainer
+        ddClient={useDockerDesktopClient()}
+        filterCriteria={filterCriteria}
+      />
     </>
   );
 }
