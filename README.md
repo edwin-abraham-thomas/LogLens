@@ -1,4 +1,4 @@
-# LogsWatch
+# LogLens
 
 This repository defines an example of a Docker extension. The files in this repository have been automatically generated as a result of running `docker extension init`.
 
@@ -30,13 +30,13 @@ You can use `docker` to build, install and push your extension. Also, we provide
 To build the extension, use `make build-extension` **or**:
 
 ```shell
-  docker buildx build -t edwinat/logswatch:latest . --load
+  docker buildx build -t edwinat/LogLens:latest . --load
 ```
 
 To install the extension, use `make install-extension` **or**:
 
 ```shell
-  docker extension install edwinat/logswatch:latest
+  docker extension install edwinat/LogLens:latest
 ```
 
 > If you want to automate this command, use the `-f` or `--force` flag to accept the warning message.
@@ -59,19 +59,19 @@ This starts a development server that listens on port `3000`.
 You can now tell Docker Desktop to use this as the frontend source. In another terminal run:
 
 ```shell
-  docker extension dev ui-source edwinat/logswatch:latest http://localhost:3000
+  docker extension dev ui-source edwinat/LogLens:latest http://localhost:3000
 ```
 
 In order to open the Chrome Dev Tools for your extension when you click on the extension tab, run:
 
 ```shell
-  docker extension dev debug edwinat/logswatch:latest
+  docker extension dev debug edwinat/LogLens:latest
 ```
 
 Each subsequent click on the extension tab will also open Chrome Dev Tools. To stop this behaviour, run:
 
 ```shell
-  docker extension dev reset edwinat/logswatch:latest
+  docker extension dev reset edwinat/LogLens:latest
 ```
 
 ### Backend development (optional)
@@ -84,7 +84,7 @@ Whenever you make changes in the [backend](./backend) source code, you will need
 Use the `docker extension update` command to remove and re-install the extension automatically:
 
 ```shell
-docker extension update edwinat/logswatch:latest
+docker extension update edwinat/LogLens:latest
 ```
 
 > If you want to automate this command, use the `-f` or `--force` flag to accept the warning message.
@@ -96,7 +96,7 @@ docker extension update edwinat/logswatch:latest
 To remove the extension:
 
 ```shell
-docker extension rm edwinat/logswatch:latest
+docker extension rm edwinat/LogLens:latest
 ```
 
 ## What's next?

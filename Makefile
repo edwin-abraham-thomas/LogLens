@@ -1,4 +1,4 @@
-IMAGE?=edwinat/logswatch
+IMAGE?=edwinat/loglens
 TAG?=latest
 
 BUILDER=buildx-multi-arch

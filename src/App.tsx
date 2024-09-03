@@ -19,7 +19,7 @@ export function App() {
   return (
     <>
       <div className="flex items-center">
-        <Typography variant="h2">Logs Watch</Typography>
+        <Typography variant="h2">Log Lens</Typography>
         <div className="spacer"></div>
         <Filter
           ddClient={useDockerDesktopClient()}
