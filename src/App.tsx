@@ -4,7 +4,7 @@ import "./styles.css";
 import { Filter } from "./components/Filter";
 import { useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
-import { Logs } from "./components/Log";
+import { LogsContainer } from "./components/LogsContainer";
 
 const client = createDockerDesktopClient();
 
@@ -14,9 +14,6 @@ function useDockerDesktopClient() {
 
 export function App() {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>();
-
-  useEffect(() => {
-  }, [filterCriteria]);
 
   return (
     <>
@@ -29,7 +26,7 @@ export function App() {
         />
       </div>
       <Divider />
-      <Logs ddClient={useDockerDesktopClient()} filterCriteria={filterCriteria} />
+      <LogsContainer ddClient={useDockerDesktopClient()} filterCriteria={filterCriteria} />
     </>
   );
 }

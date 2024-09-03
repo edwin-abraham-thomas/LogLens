@@ -24,7 +24,9 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
   const handleClose = () => setOpen(false);
 
   const [containers, setContainers] = useState<Container[]>([]);
-  const [selectedContainers, setselectedContainers] = useState<string[]>([]);
+  const [selectedContainerIds, setselectedContainerIds] = useState<string[]>(
+    []
+  );
 
   useEffect(() => {
     setInterval(() => {
@@ -35,11 +37,14 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
   }, []);
 
   useEffect(() => {
+    const selectedContainers = containers.filter((c) =>
+      selectedContainerIds.includes(c.Id)
+    );
     setFilterCriteria({
-      selectedContainerIds: selectedContainers,
-      stream: "stdout"
+      selectedContainers: selectedContainers,
+      stream: "stdout",
     });
-  }, [selectedContainers]);
+  }, [selectedContainerIds]);
 
   return (
     <>
@@ -52,8 +57,8 @@ export function Filter({ ddClient, setFilterCriteria }: prop) {
           <h2>Filter</h2>
           <Containers
             containers={containers}
-            setselectedContainers={setselectedContainers}
-            selectedContainers={selectedContainers}
+            setselectedContainers={setselectedContainerIds}
+            selectedContainers={selectedContainerIds}
           ></Containers>
         </Box>
       </Modal>

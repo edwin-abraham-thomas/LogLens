@@ -54,7 +54,7 @@ export function Containers({ containers, setselectedContainers, selectedContaine
                   </ListItemIcon>
                   <ListItemText
                     id={container.Id}
-                    primary={`${container.Names[0]}`}
+                    primary={`${container.Names[0].replace(/^\//, '')}`}
                     secondary={`${container.Image}`}
                   />
                 </ListItemButton>

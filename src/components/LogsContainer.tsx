@@ -5,23 +5,24 @@ import {
 import { FilterCriteria } from "../interfaces/filterCriteria";
 import { useEffect, useState } from "react";
 import { Log } from "../interfaces/Log";
+import { Container } from "../interfaces/container";
 
 type prop = {
   ddClient: DockerDesktopClient;
   filterCriteria: FilterCriteria | undefined;
 };
 
-export function Logs({ ddClient, filterCriteria }: prop) {
+export function LogsContainer({ ddClient, filterCriteria }: prop) {
   const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
-    const execPromises = filterCriteria?.selectedContainerIds.map(
-      (containerId) => {
+    const execPromises = filterCriteria?.selectedContainers.map(
+      (container) => {
         return new Promise<Log[]>((resolve, reject) => {
           ddClient.docker.cli
-            .exec("logs", ["--timestamps", containerId])
+            .exec("logs", ["--timestamps", container.Id])
             .then((execResult: ExecResult) => {
-              const logs = parseLogs(execResult, containerId);
+              const logs = parseLogs(execResult, container);
               resolve(logs);
             })
             .catch((err) => reject(err));
@@ -49,7 +50,7 @@ export function Logs({ ddClient, filterCriteria }: prop) {
 
         const sortedLogs = allLogs
           .sort(
-            (a: Log, b: Log) => a.timestamp?.getTime() - b.timestamp?.getTime()
+            (a, b) => a.timestamp?.getTime() - b.timestamp?.getTime()
           );
         setLogs(sortedLogs);
       }
@@ -63,7 +64,7 @@ export function Logs({ ddClient, filterCriteria }: prop) {
   );
 }
 
-function parseLogs(execResult: ExecResult, containerId: string): Log[] {
+function parseLogs(execResult: ExecResult, container: Container): Log[] {
   return execResult.stdout
     .split("\n")
     .filter((e) => e)
@@ -72,8 +73,9 @@ function parseLogs(execResult: ExecResult, containerId: string): Log[] {
       const time = e.slice(0, splitIndex);
       const log = e.slice(splitIndex + 1);
       return {
-        containerId: containerId,
         timestamp: new Date(time),
+        containerId: container.Id,
+        containerName: container.Names[0].replace(/^\//, ''),
         log: log,
       };
     });

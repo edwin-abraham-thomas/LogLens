@@ -1,4 +1,6 @@
+import { Container } from "./container";
+
 export interface FilterCriteria {
-  selectedContainerIds: string[];
+  selectedContainers: Container[];
   stream: 'stdout' | 'stderr';
 }
