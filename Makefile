@@ -16,10 +16,8 @@ update-extension: build-extension ## Update the extension
 	docker extension update $(IMAGE):$(TAG)
 
 attach-localhost:
-	make update-extension
 	docker extension dev ui-source $(IMAGE):$(TAG) http://localhost:3000
 	docker extension dev debug $(IMAGE):$(TAG)
-	npm run dev
 
 prepare-buildx: ## Create buildx builder for multi-arch build, if not exists
 	docker buildx inspect $(BUILDER) || docker buildx create --name=$(BUILDER) --driver=docker-container --driver-opt=network=host
