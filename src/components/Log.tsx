@@ -33,17 +33,27 @@ export function Logs({ ddClient, filterCriteria }: prop) {
       return;
     }
 
-    Promise.allSettled(execPromises).then((result: PromiseSettledResult<Log[]>[]) => {
-      const allLogs: Log[] = (result as PromiseFulfilledResult<Log[]>[]).reduce((acc: Log[], res: any) => {
-        acc.concat(res.value)
-      }, [])
-      
-      console.log('Logs: ', allLogs)
-      const sortedLogs = result
-      .map((res: any) => res.value)
-      .sort((a: Log, b: Log) => a.timestamp?.getTime() - b.timestamp?.getTime())
-      setLogs(sortedLogs);
-    });
+    Promise.allSettled(execPromises).then(
+      (results: PromiseSettledResult<Log[]>[]) => {
+        let allLogs: Log[] = [];
+        for (const result of results) {
+          if (result.status === "fulfilled") {
+            allLogs = allLogs.concat(result.value);
+          } else {
+            console.error(
+              "Error getting logs for a container: ",
+              result.reason
+            );
+          }
+        }
+
+        const sortedLogs = allLogs
+          .sort(
+            (a: Log, b: Log) => a.timestamp?.getTime() - b.timestamp?.getTime()
+          );
+        setLogs(sortedLogs);
+      }
+    );
   }, [filterCriteria]);
 
   return (
