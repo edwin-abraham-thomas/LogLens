@@ -16,7 +16,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "jest src"
+    "install-extension": "make install-extension",
+    "update-extension": "make update-extension",
+    "attach-localhost": "make attach-localhost"
   },
   "devDependencies": {
     "@docker/extension-api-client-types": "0.3.4",
