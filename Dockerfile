@@ -13,12 +13,12 @@ RUN npm run build
 
 FROM alpine
 LABEL org.opencontainers.image.title="Log Lens" \
-    org.opencontainers.image.description="View container logs. Alpha release" \
+    org.opencontainers.image.description="Filter and view container logs. (Alpha release)" \
     org.opencontainers.image.vendor="edwinat" \
-    com.docker.desktop.extension.api.version="0.3.3" \
+    com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.desktop.extension.icon="https://raw.githubusercontent.com/edwin-abraham-thomas/LogLens/main/loglens.svg" \
-    com.docker.extension.screenshots="" \
-    com.docker.extension.detailed-description="" \
+    com.docker.extension.screenshots='[{"alt":"Logs view", "url":"https://raw.githubusercontent.com/edwin-abraham-thomas/LogLens/main/screenshots/Logs.png"}, {"alt":"Filter view", "url":"https://raw.githubusercontent.com/edwin-abraham-thomas/LogLens/main/screenshots/Filter.png"}]' \
+    com.docker.extension.detailed-description="Dive into logs and gain insights into what is going on inside your containers" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
     com.docker.extension.changelog="<p>Extension changelog<ul><li>Alpha launch</li></ul></p>" \
