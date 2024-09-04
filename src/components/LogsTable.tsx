@@ -17,12 +17,13 @@ export function LogsTable({ logs }: prop) {
   return (
     <>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+        <Table stickyHeader size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: "17rem", minWidth: "17rem" }}>
+              <TableCell sx={{ width: "12rem" }}>
                 Timestamp
               </TableCell>
+              <TableCell align="left">Container</TableCell>
               <TableCell align="left">Message</TableCell>
             </TableRow>
           </TableHead>
@@ -30,8 +31,9 @@ export function LogsTable({ logs }: prop) {
             {logs.map((log, index) => (
               <TableRow hover key={index}>
                 <TableCell component="th" scope="row">
-                  {log.timestamp.toUTCString()}
+                  {log.timestamp.toLocaleString()}
                 </TableCell>
+                <TableCell align="left">{log.containerName}</TableCell>
                 <TableCell align="left">{log.log}</TableCell>
               </TableRow>
             ))}

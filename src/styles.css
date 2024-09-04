@@ -18,3 +18,7 @@
 .app-header {
   margin: 0;
 }
+
+.pos {
+  position: static;
+}

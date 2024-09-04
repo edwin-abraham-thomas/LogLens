@@ -2,10 +2,10 @@ import { createDockerDesktopClient } from "@docker/extension-api-client";
 import Divider from "@mui/material/Divider";
 import "./styles.css";
 import { Filter } from "./components/Filter";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { LogsContainer } from "./components/LogsContainer";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 const client = createDockerDesktopClient();
 
@@ -16,12 +16,12 @@ function useDockerDesktopClient() {
 export function App() {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     selectedContainers: [],
-    stderr: false,
-    stdout: false,
+    stderr: true,
+    stdout: true,
   });
 
   return (
-    <>
+    <Box sx={{ height: '95vh', display: 'flex', flexDirection: 'column' }}>
       <div className="flex items-center">
         <Typography variant="h2">Log Lens</Typography>
         <div className="spacer"></div>
@@ -36,6 +36,6 @@ export function App() {
         ddClient={useDockerDesktopClient()}
         filterCriteria={filterCriteria}
       />
-    </>
+    </Box>
   );
 }

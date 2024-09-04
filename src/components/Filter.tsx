@@ -7,6 +7,7 @@ import {
   CardHeader,
   Checkbox,
   Divider,
+  Fab,
   List,
   ListItem,
   ListItemButton,
@@ -44,10 +45,19 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
     []
   );
 
-  useEffect(() => {
-    ddClient.docker.listContainers().then((fetchedContainers) => {
-      setContainers(fetchedContainers as Container[]);
+  const refreshContainerList = () => {
+    ddClient.docker.listContainers().then((containers) => {
+      const fetchedContainers = containers as Container[];
+      setContainers(fetchedContainers);
+      setselectedContainerIds(fetchedContainers.map((c) => c.Id));
     });
+  };
+
+  useEffect(() => {
+    refreshContainerList();
+    setInterval(() => {
+      refreshContainerList();
+    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -66,7 +76,12 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
         <FilterList />
       </IconButton>
 
-      <Modal className="flex flex-center" open={open} onClose={handleClose}>
+      <Modal
+        sx={{ position: "fixed", zIndex: 9999 }}
+        className="flex flex-center"
+        open={open}
+        onClose={handleClose}
+      >
         <Box sx={modalStyle}>
           <Typography sx={{ marginBottom: "2rem" }} variant="h2">
             Filter
