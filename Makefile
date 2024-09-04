@@ -1,5 +1,5 @@
 IMAGE?=edwinat/loglens
-TAG?=latest
+TAG?=0.1.0-alpha
 
 BUILDER=buildx-multi-arch
 

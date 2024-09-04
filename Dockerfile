@@ -10,19 +10,19 @@ RUN --mount=type=cache,target=/usr/src/app/.npm \
 # install
 COPY . /ui
 RUN npm run build
-RUN ls
 
 FROM alpine
-LABEL org.opencontainers.image.title="My extension" \
-    org.opencontainers.image.description="Your Desktop Extension Description" \
-    org.opencontainers.image.vendor="Awesome Inc." \
+LABEL org.opencontainers.image.title="Log Lens" \
+    org.opencontainers.image.description="View container logs. Alpha release" \
+    org.opencontainers.image.vendor="edwinat" \
     com.docker.desktop.extension.api.version="0.3.3" \
-    com.docker.desktop.extension.icon="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/edwin-abraham-thomas/LogLens/main/loglens.svg" \
     com.docker.extension.screenshots="" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
-    com.docker.extension.changelog=""
+    com.docker.extension.changelog="<p>Extension changelog<ul><li>Alpha launch</li></ul></p>" \
+    com.docker.extension.categories="utility-tools"
 COPY metadata.json .
 COPY loglens.svg .
 COPY --from=client-builder /ui/build ui
