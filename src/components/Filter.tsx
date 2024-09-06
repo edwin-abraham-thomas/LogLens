@@ -1,13 +1,10 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
-import { FilterList, Padding } from "@mui/icons-material";
+import { FilterList } from "@mui/icons-material";
 import {
   Box,
   Card,
   CardContent,
-  CardHeader,
   Checkbox,
-  Divider,
-  Fab,
   List,
   ListItem,
   ListItemButton,
@@ -49,15 +46,12 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
     ddClient.docker.listContainers().then((containers) => {
       const fetchedContainers = containers as Container[];
       setContainers(fetchedContainers);
-      setselectedContainerIds(fetchedContainers.map((c) => c.Id));
+      setselectedContainerIds(filterCriteria.selectedContainers.map(c => c.Id))
     });
   };
 
   useEffect(() => {
     refreshContainerList();
-    setInterval(() => {
-      refreshContainerList();
-    }, 1000);
   }, []);
 
   useEffect(() => {

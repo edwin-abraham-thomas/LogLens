@@ -57,7 +57,7 @@ export function LogsContainer({ ddClient, filterCriteria }: prop) {
         }
 
         const sortedLogs = allLogs.sort(
-          (a, b) => a.timestamp?.getTime() - b.timestamp?.getTime()
+          (a, b) => b.timestamp?.getTime() - a.timestamp?.getTime()
         );
         setLogs(sortedLogs);
       }
