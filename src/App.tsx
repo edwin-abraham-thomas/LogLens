@@ -6,8 +6,7 @@ import { useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { LogsContainer } from "./components/LogsContainer";
 import { Box, Typography } from "@mui/material";
-
-const FILTER_CRITERIA_LOCAL_STORAGE_KEY = "LogLens_FilterCriteria";
+import { Constants } from "./constants";
 
 const client = createDockerDesktopClient();
 function useDockerDesktopClient() {
@@ -19,17 +18,21 @@ export function App() {
 
   useEffect(() => {
     const presetFilterCriteriaString = localStorage.getItem(
-      FILTER_CRITERIA_LOCAL_STORAGE_KEY
+      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
     );
+    console.log("checking for preset filter", presetFilterCriteriaString);
     if (
       presetFilterCriteriaString !== null &&
       presetFilterCriteriaString !== "" &&
       presetFilterCriteriaString !== undefined
     ) {
-      setFilterCriteria(
-        JSON.parse(presetFilterCriteriaString) satisfies FilterCriteria
+      console.log(
+        "setting preset filter",
+        presetFilterCriteriaString != undefined
       );
+      setFilterCriteria(JSON.parse(presetFilterCriteriaString));
     } else {
+      console.log("setting default filter", presetFilterCriteriaString);
       setFilterCriteria({
         selectedContainers: [],
         stderr: true,
@@ -39,12 +42,13 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      localStorage.setItem(
-        FILTER_CRITERIA_LOCAL_STORAGE_KEY,
-        JSON.stringify(filterCriteria)
-      );
-    }, 10);
+    if (filterCriteria === null || filterCriteria === undefined) {
+      return;
+    }
+    localStorage.setItem(
+      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
+      JSON.stringify(filterCriteria)
+    );
   }, [filterCriteria]);
 
   return (
