@@ -20,19 +20,19 @@ export function App() {
     const presetFilterCriteriaString = localStorage.getItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
     );
-    console.log("checking for preset filter", presetFilterCriteriaString);
+    console.log("checking for preset filter");
     if (
       presetFilterCriteriaString !== null &&
       presetFilterCriteriaString !== "" &&
       presetFilterCriteriaString !== undefined
     ) {
+      const presetFilter = JSON.parse(presetFilterCriteriaString)
       console.log(
-        "setting preset filter",
-        presetFilterCriteriaString != undefined
+        "setting preset filter", presetFilter
       );
-      setFilterCriteria(JSON.parse(presetFilterCriteriaString));
+      setFilterCriteria(presetFilter);
     } else {
-      console.log("setting default filter", presetFilterCriteriaString);
+      console.log("setting default filter");
       setFilterCriteria({
         selectedContainers: [],
         stderr: true,
@@ -45,6 +45,7 @@ export function App() {
     if (filterCriteria === null || filterCriteria === undefined) {
       return;
     }
+    console.log('storing into localstorage', filterCriteria)
     localStorage.setItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
       JSON.stringify(filterCriteria)
