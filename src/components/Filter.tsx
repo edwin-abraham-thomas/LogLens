@@ -42,22 +42,28 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
     []
   );
 
+  let isFirstRender: boolean = true;
+
   const refreshContainerList = () => {
     ddClient.docker.listContainers().then((containers) => {
       const fetchedContainers = containers as Container[];
       setContainers(fetchedContainers);
-      const fetchedContainerIds = fetchedContainers.map((c) => c.Id);
-      console.log('setting selectedContainerIds');
-      setselectedContainerIds(
-        filterCriteria.selectedContainers
-          .map((c) => c.Id)
-      );
+      if (isFirstRender) {
+        console.log("setting selectedContainerIds");
+        setselectedContainerIds(
+          filterCriteria.selectedContainers.map((c) => c.Id)
+        );
+        isFirstRender = false;
+      }
+
       console.log("refreshed container list");
     });
   };
 
   useEffect(() => {
-    refreshContainerList();
+    setInterval(() => {
+      refreshContainerList();
+    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -68,7 +74,10 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
       ...filterCriteria,
       selectedContainers: selectedContainers,
     };
-    console.log('Filter useEffect selectedContainerIds - ', {filterCriteriaUpdate, selectedContainerIds})
+    console.log("Filter useEffect selectedContainerIds - ", {
+      filterCriteriaUpdate,
+      selectedContainerIds,
+    });
     setFilterCriteria(filterCriteriaUpdate);
   }, [selectedContainerIds]);
 

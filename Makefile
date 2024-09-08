@@ -19,6 +19,9 @@ attach-localhost:
 	docker extension dev ui-source $(IMAGE):$(TAG) http://localhost:3000
 	docker extension dev debug $(IMAGE):$(TAG)
 
+reset-localhost:
+	docker extension dev reset $(IMAGE):$(TAG)
+
 prepare-buildx: ## Create buildx builder for multi-arch build, if not exists
 	docker buildx inspect $(BUILDER) || docker buildx create --name=$(BUILDER) --driver=docker-container --driver-opt=network=host
 
