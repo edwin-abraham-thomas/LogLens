@@ -47,6 +47,7 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
       const fetchedContainers = containers as Container[];
       setContainers(fetchedContainers);
       const fetchedContainerIds = fetchedContainers.map((c) => c.Id);
+      console.log('setting selectedContainerIds');
       setselectedContainerIds(
         filterCriteria.selectedContainers
           .map((c) => c.Id)
@@ -56,11 +57,8 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
   };
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
     refreshContainerList();
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     const selectedContainers = containers.filter((c) =>
