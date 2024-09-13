@@ -4,7 +4,7 @@ import {
 } from "@docker/extension-api-client-types/dist/v1";
 import { FilterCriteria } from "../interfaces/filterCriteria";
 import { useEffect, useState } from "react";
-import { Log } from "../interfaces/Log";
+import { Log } from "../interfaces/log";
 import { Container } from "../interfaces/container";
 import { LogsTable } from "./LogsTable";
 
