@@ -1,5 +1,5 @@
 IMAGE?=edwinat/loglens
-TAG?=0.1.0-alpha
+TAG?=0.1.1-alpha
 
 BUILDER=buildx-multi-arch
 
@@ -14,6 +14,9 @@ install-extension: build-extension ## Install the extension
 
 update-extension: build-extension ## Update the extension
 	docker extension update $(IMAGE):$(TAG)
+
+validate-extension: push-extension
+	docker extension validate -a -s -i $(IMAGE):$(TAG)
 
 attach-localhost:
 	docker extension dev ui-source $(IMAGE):$(TAG) http://localhost:3000
