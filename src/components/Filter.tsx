@@ -1,5 +1,5 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
-import { FilterList } from "@mui/icons-material";
+import { FilterList, Height } from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -24,6 +24,8 @@ const modalStyle = {
   width: 600,
   padding: "1rem",
   bgcolor: "background.paper",
+  maxHeight: "50rem",
+  overflow: "auto"
 };
 
 type prop = {
