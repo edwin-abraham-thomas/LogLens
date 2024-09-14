@@ -34,13 +34,15 @@ export function DockerContainers({
 
   return (
     <>
-      <Typography variant="subtitle1">Containers</Typography>
+      <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
+        Containers
+      </Typography>
       <Box
         sx={{
           width: "100%",
-          height: "100%",
-          borderRadius: 1,
+          maxHeight: "20rem",
           bgcolor: "primary.dark",
+          overflow: "auto",
         }}
       >
         <List sx={{ bgcolor: "background.paper" }} dense>

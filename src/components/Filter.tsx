@@ -25,7 +25,7 @@ const modalStyle = {
   padding: "1rem",
   bgcolor: "background.paper",
   maxHeight: "50rem",
-  overflow: "auto"
+  // overflow: "auto"
 };
 
 type prop = {
