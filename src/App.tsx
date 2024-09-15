@@ -5,8 +5,9 @@ import { Filter } from "./components/Filter";
 import { useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { LogsContainer } from "./components/LogsContainer";
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { Constants } from "./constants";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const client = createDockerDesktopClient();
 function useDockerDesktopClient() {
@@ -15,6 +16,7 @@ function useDockerDesktopClient() {
 
 export function App() {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>();
+  const [logsRefreshTrigger, setLogsRefreshTrigger] = useState<boolean>(false);
 
   useEffect(() => {
     const presetFilterCriteriaString = localStorage.getItem(
@@ -26,10 +28,8 @@ export function App() {
       presetFilterCriteriaString !== "" &&
       presetFilterCriteriaString !== undefined
     ) {
-      const presetFilter = JSON.parse(presetFilterCriteriaString)
-      console.log(
-        "setting preset filter", presetFilter
-      );
+      const presetFilter = JSON.parse(presetFilterCriteriaString);
+      console.log("setting preset filter", presetFilter);
       setFilterCriteria(presetFilter);
     } else {
       console.log("setting default filter");
@@ -45,7 +45,7 @@ export function App() {
     if (filterCriteria === null || filterCriteria === undefined) {
       return;
     }
-    console.log('storing into localstorage', filterCriteria)
+    console.log("storing into localstorage", filterCriteria);
     localStorage.setItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
       JSON.stringify(filterCriteria)
@@ -57,6 +57,12 @@ export function App() {
       <div className="flex items-center">
         <Typography variant="h2">Log Lens</Typography>
         <div className="spacer"></div>
+        <IconButton
+          aria-label="filter"
+          onClick={() => setLogsRefreshTrigger(!logsRefreshTrigger)}
+        >
+          <RefreshIcon />
+        </IconButton>
         {filterCriteria && (
           <Filter
             ddClient={useDockerDesktopClient()}
@@ -69,6 +75,7 @@ export function App() {
       <LogsContainer
         ddClient={useDockerDesktopClient()}
         filterCriteria={filterCriteria}
+        refreshtrigger={logsRefreshTrigger}
       />
     </Box>
   );
