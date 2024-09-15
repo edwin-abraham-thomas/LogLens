@@ -20,7 +20,15 @@ export function LogDetails({ log }: prop) {
         </Typography>
         <LogField
           fieldName="Timestamp"
-          value={log.timestamp.toLocaleString()}
+          value={log.timestamp.toLocaleString(undefined, {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            fractionalSecondDigits: 3,
+          })}
         ></LogField>
         <LogField fieldName="Container" value={log.containerName}></LogField>
         <LogMessage log={log}></LogMessage>

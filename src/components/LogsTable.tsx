@@ -35,8 +35,8 @@ export function LogsTable({ logs }: prop) {
         <Table stickyHeader size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: "12rem" }}>Timestamp</TableCell>
-              <TableCell align="left">Container</TableCell>
+              <TableCell sx={{ minWidth: "15rem" }}>Timestamp</TableCell>
+              <TableCell sx={{ minWidth: "25rem" }} align="left">Container</TableCell>
               <TableCell align="left">Message</TableCell>
             </TableRow>
           </TableHead>
@@ -48,7 +48,15 @@ export function LogsTable({ logs }: prop) {
                 onClick={toggleDrawer({ open: true, log: log })}
               >
                 <TableCell component="th" scope="row">
-                  {log.timestamp.toLocaleString()}
+                  {log.timestamp.toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    fractionalSecondDigits: 3
+                  })}
                 </TableCell>
                 <TableCell align="left">{log.containerName}</TableCell>
                 <TableCell align="left">{log.log}</TableCell>

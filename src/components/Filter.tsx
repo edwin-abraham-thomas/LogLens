@@ -1,5 +1,5 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
-import { FilterList } from "@mui/icons-material";
+import { BorderAllOutlined, FilterList } from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -19,7 +19,10 @@ import { FilterCriteria } from "../interfaces/filterCriteria";
 const modalStyle = {
   width: 600,
   padding: "1rem",
-  bgcolor: "background.paper",
+  bgcolor: "background.default",
+  borderRadius: 1,
+  border: "solid",
+  borderColor: "secondary.main",
   maxHeight: "80vh",
 };
 
@@ -96,12 +99,12 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
           </Typography>
 
           <Stack spacing={3}>
-            <Card>
+            {/* <Card> */}
               <CardContent>
                 {LogSourceList(filterCriteria, setFilterCriteria)}
               </CardContent>
-            </Card>
-            <Card>
+            {/* </Card> */}
+            {/* <Card> */}
               <CardContent>
                 <DockerContainers
                   containers={containers}
@@ -109,7 +112,7 @@ export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
                   selectedContainers={selectedContainerIds}
                 ></DockerContainers>
               </CardContent>
-            </Card>
+            {/* </Card> */}
           </Stack>
         </Box>
       </Modal>
