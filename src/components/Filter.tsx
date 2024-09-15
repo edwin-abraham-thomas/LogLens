@@ -1,15 +1,11 @@
 import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
-import { FilterList, Height } from "@mui/icons-material";
+import { FilterList } from "@mui/icons-material";
 import {
   Box,
   Card,
   CardContent,
   Checkbox,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
+  FormControlLabel,
   Modal,
   Stack,
   Typography,
@@ -24,8 +20,7 @@ const modalStyle = {
   width: 600,
   padding: "1rem",
   bgcolor: "background.paper",
-  maxHeight: "50rem",
-  // overflow: "auto"
+  maxHeight: "80vh",
 };
 
 type prop = {
@@ -129,50 +124,42 @@ function LogSourceList(
   return (
     <>
       <Typography variant="subtitle1">Source</Typography>
-      <List sx={{ bgcolor: "background.paper" }} dense>
-        <ListItem>
-          <ListItemButton
-            onClick={() =>
-              setFilterCriteria({
-                ...filterCriteria,
-                stdout: !filterCriteria.stdout,
-              })
-            }
-          >
-            <ListItemIcon>
-              <Checkbox
-                edge="start"
-                checked={filterCriteria.stdout}
-                tabIndex={-1}
-                disableRipple
-                inputProps={{ "aria-labelledby": "stdout" }}
-              />
-            </ListItemIcon>
-            <ListItemText id={"stdout"} primary={"stdout"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem>
-          <ListItemButton
-            onClick={() =>
-              setFilterCriteria({
-                ...filterCriteria,
-                stderr: !filterCriteria.stderr,
-              })
-            }
-          >
-            <ListItemIcon>
-              <Checkbox
-                edge="start"
-                checked={filterCriteria.stderr}
-                tabIndex={-1}
-                disableRipple
-                inputProps={{ "aria-labelledby": "stderr" }}
-              />
-            </ListItemIcon>
-            <ListItemText id={"stderr"} primary={"stderr"} />
-          </ListItemButton>
-        </ListItem>
-      </List>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onClick={() =>
+                    setFilterCriteria({
+                      ...filterCriteria,
+                      stdout: !filterCriteria.stdout,
+                    })
+                  }
+                  edge="start"
+                  checked={filterCriteria.stdout}
+                  tabIndex={-1}
+                  disableRipple
+                  inputProps={{ "aria-labelledby": "stdout" }}
+                />
+              }
+              label="stdout"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onClick={() =>
+                    setFilterCriteria({
+                      ...filterCriteria,
+                      stderr: !filterCriteria.stderr,
+                    })
+                  }
+                  edge="start"
+                  checked={filterCriteria.stderr}
+                  tabIndex={-1}
+                  disableRipple
+                  inputProps={{ "aria-labelledby": "stderr" }}
+                />
+              }
+              label="stderr"
+            />
     </>
   );
 }

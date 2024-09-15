@@ -40,7 +40,7 @@ export function DockerContainers({
       <Box
         sx={{
           width: "100%",
-          maxHeight: "20rem",
+          maxHeight: "50vh",
           bgcolor: "primary.dark",
           overflow: "auto",
         }}
