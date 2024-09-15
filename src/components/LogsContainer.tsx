@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Log } from "../interfaces/log";
 import { Container } from "../interfaces/container";
 import { LogsTable } from "./LogsTable";
+import { LogParser } from "../services/logParser";
 
 type prop = {
   ddClient: DockerDesktopClient;
@@ -22,12 +23,12 @@ export function LogsContainer({ ddClient, filterCriteria }: prop) {
         ddClient.docker.cli
           .exec("logs", ["--timestamps", container.Id])
           .then((execResult: ExecResult) => {
-            const stdoutLogs = parseStdoutLogs(
+            const stdoutLogs = LogParser.parseStdoutLogs(
               execResult,
               container,
               filterCriteria
             );
-            const stderrLogs = parseStderrLogs(
+            const stderrLogs = LogParser.parseStderrLogs(
               execResult,
               container,
               filterCriteria
@@ -69,54 +70,4 @@ export function LogsContainer({ ddClient, filterCriteria }: prop) {
       <LogsTable logs={logs} />
     </>
   );
-}
-
-function parseStdoutLogs(
-  execResult: ExecResult,
-  container: Container,
-  filterCriteria: FilterCriteria
-): Log[] {
-  if (!filterCriteria.stdout) {
-    return [];
-  }
-  return execResult.stdout
-    .split("\n")
-    .filter((e) => e)
-    .map((e) => {
-      const splitIndex = e.indexOf(" ");
-      const time = e.slice(0, splitIndex);
-      const log = e.slice(splitIndex + 1);
-      return {
-        timestamp: new Date(time),
-        containerId: container.Id,
-        containerName: container.Names[0].replace(/^\//, ""),
-        log: log,
-        stream: "stdout",
-      };
-    });
-}
-
-function parseStderrLogs(
-  execResult: ExecResult,
-  container: Container,
-  filterCriteria: FilterCriteria
-): Log[] {
-  if (!filterCriteria.stderr) {
-    return [];
-  }
-  return execResult.stderr
-    .split("\n")
-    .filter((e) => e)
-    .map((e) => {
-      const splitIndex = e.indexOf(" ");
-      const time = e.slice(0, splitIndex);
-      const log = e.slice(splitIndex + 1);
-      return {
-        timestamp: new Date(time),
-        containerId: container.Id,
-        containerName: container.Names[0].replace(/^\//, ""),
-        log: log,
-        stream: "stdrr",
-      };
-    });
 }
