@@ -1,67 +1,84 @@
-import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
+import {
+  DockerDesktopClient,
+  ExecProcess,
+  ExecResult,
+} from "@docker/extension-api-client-types/dist/v1";
 import { Log } from "../interfaces/log";
 import { FilterCriteria } from "../interfaces/filterCriteria";
 import { MutableRefObject } from "react";
+import { Container } from "../interfaces/container";
+import { Stream } from "../types/stream";
 
 export class LogService {
   public static _ddClient: DockerDesktopClient;
 
-  public static setLogListener(
+  public static setLogListeners(
     filter: FilterCriteria,
     logs: MutableRefObject<Log[]>,
     setLog: (current: Log[]) => void
-  ) {
+  ): ExecProcess[] {
     const client = this._ddClient;
 
-    const appendLog = (newLog: Log) => {
-      setLog([...logs.current, newLog]);
-    };
+    const listeners = filter.selectedContainers.map((container) => {
+      const appendLog = (newLogString: string | undefined, stream: Stream) => {
+        if (!newLogString) {
+          return;
+        }
+        const newLogs: Log[] = LogService.parseLog(newLogString, container, stream);
+        setLog([...logs.current, ...newLogs]);
+      };
 
-    return this._ddClient.docker.cli.exec(
-      "logs",
-      [
-        "-f",
-        "-t",
-        "3ca9761d9539ad1505e56185a5397d39102a374625fdabab0d036a87a297d514",
-      ],
-      {
-        stream: {
-          onOutput(data): void {
-            if (data.stdout) {
-              const newLogStdout = LogService.parseLog(data.stdout);
-              console.log("t:", newLogStdout.timestamp, "--", "l:", newLogStdout.log)
-              setTimeout(() => appendLog(newLogStdout), 1);
-              return;
-            }
-            if (data.stderr) {
-              const newLogStderr = LogService.parseLog(data.stderr);
-              setTimeout(() => appendLog(newLogStderr), 0);
-              return;
-            }
+      return this._ddClient.docker.cli.exec(
+        "logs",
+        ["-f", "-t", container.Id],
+        {
+          stream: {
+            onOutput(data): void {
+              setTimeout(() => {
+                if(filter.stdout)
+                  appendLog(data.stdout, "stdout");
+                if(filter.stderr)
+                appendLog(data.stderr, "stdrr");
+              }, 0);
+            },
+            onError(error: unknown): void {
+              client.desktopUI.toast.error("An error occurred");
+              console.log(error);
+            },
+            onClose(exitCode) {
+              console.log("onClose with exit code " + exitCode);
+            },
+            splitOutputLines: false,
           },
-          onError(error: unknown): void {
-            client.desktopUI.toast.error("An error occurred");
-            console.log(error);
-          },
-          onClose(exitCode) {
-            console.log("onClose with exit code " + exitCode);
-          },
-          splitOutputLines: false,
-        },
-      }
-    );
+        }
+      );
+    });
+
+    return listeners;
   }
 
-  private static parseLog(logString: string): Log {
-    const splitIndex = logString.indexOf(" ");
-    const time = logString.slice(0, splitIndex);
-    const log = logString.slice(splitIndex + 1);
-    return {
-      timestamp: new Date(time),
-      containerId: "Dummy",
-      containerName: "Dummy",
-      stream: "stdout",
-      log: log,
-    };
+  private static parseLog(
+    logsString: string,
+    container: Container,
+    stream: Stream
+  ): Log[] {
+    const logs: Log[] = logsString
+      .split("\n")
+      .filter((e) => e)
+      .map((logString) => {
+        const splitIndex = logString.indexOf(" ");
+        const time = logString.slice(0, splitIndex);
+        const log = logString.slice(splitIndex + 1);
+        // console.log("t:", time, " ", "m:", log);
+        return {
+          timestamp: new Date(time),
+          containerId: container.Id,
+          containerName: container.Names[0].replace(/^\//, ""),
+          stream: stream,
+          log: log,
+        };
+      });
+
+    return logs;
   }
 }
