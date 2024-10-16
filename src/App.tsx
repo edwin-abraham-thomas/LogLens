@@ -1,21 +1,30 @@
-import { createDockerDesktopClient } from "@docker/extension-api-client";
 import "./styles.css";
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { LogService } from "./services/logService";
 import { Log } from "./interfaces/log";
 import { FilterCriteria } from "./interfaces/filterCriteria";
-
-const client = createDockerDesktopClient();
-function useDockerDesktopClient() {
-  return client;
-}
+import { Filter } from "./components/Filter";
+import { FilterList } from "@mui/icons-material";
 
 export function App() {
-  LogService._ddClient = useDockerDesktopClient();
   const [logs, setLogs] = useState<Log[]>([]);
   const logsRef = useRef<Log[]>([]);
   logsRef.current = logs;
+
+  //Filter modal settings
+  const filterModalStyle = {
+    width: 600,
+    padding: "1rem",
+    bgcolor: "background.default",
+    borderRadius: 1,
+    border: "solid",
+    borderColor: "secondary.main",
+    maxHeight: "80vh",
+  };
+  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+  const handleFilterModalClose = () => setFilterModalOpen(false);
+  const handleFilterModalOpen = () => setFilterModalOpen(true);
 
   const filter: FilterCriteria = {
     selectedContainers: [
@@ -47,19 +56,22 @@ export function App() {
       listener.forEach((listener) => {
         listener.close();
       });
-      logsRef.current = []
+      logsRef.current = [];
     };
   }, []);
 
-  console.log(logs);
-
   return (
-    <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
-      <div className="flex items-center">
-        <Typography variant="h2">Log Lens</Typography>
-      </div>
-      <Divider />
-      <div>
+    <>
+      <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
+        <div className="flex items-center">
+          <Typography variant="h2">Log Lens</Typography>
+          <div className="spacer"></div>
+          <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
+            <FilterList />
+          </IconButton>
+        </div>
+        <Divider />
+        {/* <div>
         {logs.map((log, index) => (
           <div key={index}>
             <pre>
@@ -81,7 +93,19 @@ export function App() {
             </pre>
           </div>
         ))}
-      </div>
-    </Box>
+      </div> */}
+      </Box>
+
+      <Modal
+        sx={{ position: "fixed", zIndex: 9999 }}
+        className="flex flex-center"
+        open={filterModalOpen}
+        onClose={handleFilterModalClose}
+      >
+        <Box sx={filterModalStyle}>
+          <Filter />
+        </Box>
+      </Modal>
+    </>
   );
 }

@@ -8,16 +8,15 @@ import { FilterCriteria } from "../interfaces/filterCriteria";
 import { MutableRefObject } from "react";
 import { Container } from "../interfaces/container";
 import { Stream } from "../types/stream";
+import { DdClientProvider } from "./ddClientProvider";
 
 export class LogService {
-  public static _ddClient: DockerDesktopClient;
-
   public static setLogListeners(
     filter: FilterCriteria,
     logs: MutableRefObject<Log[]>,
     setLog: (current: Log[]) => void
   ): ExecProcess[] {
-    const client = this._ddClient;
+    const client = DdClientProvider.getClient();
 
     const listeners = filter.selectedContainers.map((container) => {
       const appendLog = (newLogString: string | undefined, stream: Stream) => {
@@ -28,7 +27,7 @@ export class LogService {
         setLog([...logs.current, ...newLogs]);
       };
 
-      return this._ddClient.docker.cli.exec(
+      return client.docker.cli.exec(
         "logs",
         ["-f", "-t", container.Id],
         {
