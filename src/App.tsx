@@ -71,29 +71,6 @@ export function App() {
           </IconButton>
         </div>
         <Divider />
-        {/* <div>
-        {logs.map((log, index) => (
-          <div key={index}>
-            <pre>
-              {index}
-              {" | "}
-              {log.timestamp.toLocaleString(undefined, {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                fractionalSecondDigits: 3,
-              })}
-              {" -- "}
-              {log.containerName}
-              {" -- "}
-              {log.log}
-            </pre>
-          </div>
-        ))}
-      </div> */}
       </Box>
 
       <Modal
