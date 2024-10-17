@@ -1,5 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { FilterCriteria } from "../interfaces/filterCriteria";
+import { Container } from "../interfaces/container";
 
 const filterCriteriaInitialState: FilterCriteria = {
   selectedContainers: [],
@@ -11,6 +12,19 @@ const FilterCriteriaContext = createContext<FilterCriteria>(
   filterCriteriaInitialState
 );
 
+const FilterCriteriaUpdateContext = createContext<
+  (filterCriteria: FilterCriteria) => void
+>((filterCriteria) => {
+});
+
+export function useFilterCriteriaContext() {
+  return useContext(FilterCriteriaContext);
+}
+
+export function useFilterCriteriaUpdateContext() {
+  return useContext(FilterCriteriaUpdateContext);
+}
+
 export function FilterCriteriaProvider({ children }: any) {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
     filterCriteriaInitialState
@@ -18,7 +32,9 @@ export function FilterCriteriaProvider({ children }: any) {
 
   return (
     <FilterCriteriaContext.Provider value={filterCriteria}>
-      {children}
+      <FilterCriteriaUpdateContext.Provider value={setFilterCriteria}>
+        {children}
+      </FilterCriteriaUpdateContext.Provider>
     </FilterCriteriaContext.Provider>
   );
 }

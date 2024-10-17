@@ -6,6 +6,7 @@ import { Log } from "./interfaces/log";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { Filter } from "./components/Filter";
 import { FilterList } from "@mui/icons-material";
+import { FilterCriteriaProvider } from "./contexts/filterCriteriaContext";
 
 export function App() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -22,7 +23,7 @@ export function App() {
     borderColor: "secondary.main",
     maxHeight: "80vh",
   };
-  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(true);
   const handleFilterModalClose = () => setFilterModalOpen(false);
   const handleFilterModalOpen = () => setFilterModalOpen(true);
 
@@ -62,16 +63,18 @@ export function App() {
 
   return (
     <>
-      <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
-        <div className="flex items-center">
-          <Typography variant="h2">Log Lens</Typography>
-          <div className="spacer"></div>
-          <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
-            <FilterList />
-          </IconButton>
-        </div>
-        <Divider />
-      </Box>
+      <FilterCriteriaProvider>
+        <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
+          <div className="flex items-center">
+            <Typography variant="h2">Log Lens</Typography>
+            <div className="spacer"></div>
+            <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
+              <FilterList />
+            </IconButton>
+          </div>
+          <Divider />
+        </Box>
+      </FilterCriteriaProvider>
 
       <Modal
         sx={{ position: "fixed", zIndex: 9999 }}

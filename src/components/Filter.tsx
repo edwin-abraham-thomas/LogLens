@@ -15,8 +15,17 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import {
+  useFilterCriteriaContext,
+  useFilterCriteriaUpdateContext,
+} from "../contexts/filterCriteriaContext";
+import { FilterCriteria } from "../interfaces/filterCriteria";
 
 export function Filter() {
+  //Contexts
+  const filterCriteria = useFilterCriteriaContext();
+  const updateContext = useFilterCriteriaUpdateContext();
+
   const [containers, setContainers] = useState<Container[]>([]);
 
   const setContainersList = () => {
@@ -39,14 +48,31 @@ export function Filter() {
       </Typography>
 
       <Stack spacing={3}>
-        {logSourceList()}
-        {containerList(containers)}
+        {logSourceList(filterCriteria, updateContext)}
+        {containerList(containers, filterCriteria, updateContext)}
       </Stack>
     </>
   );
 }
 
-function logSourceList() {
+function logSourceList(
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedlogStreams, setSelectedlogStreams] = useState<{
+    stdout: boolean;
+    stderr: boolean;
+  }>({
+    stdout: filterCriteria.stdout,
+    stderr: filterCriteria.stderr,
+  });
+
+  const handleStdoutClick = () => {
+    filterCriteriaUpdate({...filterCriteria, stdout: false})
+  }
+
+  // console.log("stream settings stdout: ", filterCriteria.stdout, " stderr: ", filterCriteria.stderr)
+
   return (
     <Card>
       <CardContent>
@@ -54,14 +80,11 @@ function logSourceList() {
         <FormControlLabel
           control={
             <Checkbox
-              // onClick={() =>
-              //   setFilterCriteria({
-              //     ...filterCriteria,
-              //     stdout: !filterCriteria.stdout,
-              //   })
-              // }
+              onClick={() =>
+                handleStdoutClick()
+              }
               edge="start"
-              // checked={filterCriteria.stdout}
+              checked={filterCriteria.stdout}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stdout" }}
@@ -92,7 +115,37 @@ function logSourceList() {
   );
 }
 
-function containerList(containers: Container[]) {
+function containerList(
+  containers: Container[],
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
+    []
+  );
+
+  const handleContainerSelection = (container: Container) => {
+    var selectedContainers = filterCriteria.selectedContainers;
+    const existIndex = selectedContainers.findIndex(
+      (c) => c.Id == container.Id
+    );
+    console.log("existIndex", existIndex);
+    if (existIndex !== -1) {
+      selectedContainers = selectedContainers.filter(
+        (sc) => sc.Id !== container.Id
+      );
+      filterCriteria.selectedContainers = selectedContainers;
+    } else {
+      selectedContainers.push(container);
+      filterCriteria.selectedContainers = selectedContainers;
+    }
+    filterCriteriaUpdate(filterCriteria);
+    setSelectedContainerIds(selectedContainers.map((c) => c.Id));
+  };
+  console.log(
+    "selectedContainers: ",
+    filterCriteria.selectedContainers.map((c) => c.Names[0]).join(" ")
+  );
   return (
     <Card>
       <CardContent>
@@ -112,14 +165,14 @@ function containerList(containers: Container[]) {
               return (
                 <ListItem key={container.Id}>
                   <ListItemButton
-                  // onClick={() => handleOnCheck(container.Id)}
+                    onClick={() => handleContainerSelection(container)}
                   >
                     <ListItemIcon>
                       <Checkbox
                         edge="start"
-                        // checked={
-                        //   selectedContainers.indexOf(container.Id) !== -1
-                        // }
+                        checked={
+                          selectedContainerIds.indexOf(container.Id) !== -1
+                        }
                         tabIndex={-1}
                         disableRipple
                         inputProps={{ "aria-labelledby": container.Id }}
