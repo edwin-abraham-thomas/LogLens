@@ -1,13 +1,17 @@
-import { useFilterCriteriaContext } from "../../contexts/filterCriteriaContext";
+import { useContext } from "react";
+import { FilterCriteriaContext } from "../../App";
 
 export function LogsContainer() {
-    //Contexts
-    const filterCriteria = useFilterCriteriaContext();
-    console.log("rerender LogsContainer")
+  //Contexts
+  const { filterCriteria, setFilterCriteria } = useContext(
+    FilterCriteriaContext
+  );
 
-    return(
-        <>
-            <pre>{JSON.stringify(filterCriteria, null, 4)}</pre>
-        </>
-    )
+  console.log("rerender LogsContainer");
+
+  return (
+    <>
+      <pre>{JSON.stringify(filterCriteria, null, 2)}</pre>
+    </>
+  );
 }

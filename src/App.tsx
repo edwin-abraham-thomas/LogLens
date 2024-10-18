@@ -1,18 +1,30 @@
 import "./styles.css";
 import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { LogService } from "./services/logService";
-import { Log } from "./interfaces/log";
+import { createContext, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { Filter } from "./components/Filter";
 import { FilterList } from "@mui/icons-material";
-import { FilterCriteriaProvider } from "./contexts/filterCriteriaContext";
 import { LogsContainer } from "./components/logs/LogsContainer";
 
+// Context setup
+const filterCriteriaInitialState: FilterCriteria = {
+  selectedContainers: [],
+  stdout: true,
+  stderr: true,
+};
+type FCContextType = {
+  filterCriteria: FilterCriteria;
+  setFilterCriteria: (filterCriteria: FilterCriteria) => void;
+};
+export const FilterCriteriaContext = createContext<FCContextType>({
+  filterCriteria: filterCriteriaInitialState,
+  setFilterCriteria: () => {},
+});
+
 export function App() {
-  const [logs, setLogs] = useState<Log[]>([]);
-  const logsRef = useRef<Log[]>([]);
-  logsRef.current = logs;
+  // const [logs, setLogs] = useState<Log[]>([]);
+  // const logsRef = useRef<Log[]>([]);
+  // logsRef.current = logs;
 
   //Filter modal settings
   const filterModalStyle = {
@@ -62,9 +74,15 @@ export function App() {
   //   };
   // }, []);
 
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
+    filterCriteriaInitialState
+  );
+
   return (
     <>
-      <FilterCriteriaProvider>
+      <FilterCriteriaContext.Provider
+        value={{ filterCriteria, setFilterCriteria }}
+      >
         <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
           <div className="flex items-center">
             <Typography variant="h2">Log Lens</Typography>
@@ -76,18 +94,18 @@ export function App() {
           <Divider />
           <LogsContainer />
         </Box>
-      </FilterCriteriaProvider>
 
-      <Modal
-        sx={{ position: "fixed", zIndex: 9999 }}
-        className="flex flex-center"
-        open={filterModalOpen}
-        onClose={handleFilterModalClose}
-      >
-        <Box sx={filterModalStyle}>
-          <Filter />
-        </Box>
-      </Modal>
+        <Modal
+          sx={{ position: "fixed", zIndex: 9999 }}
+          className="flex flex-center"
+          open={filterModalOpen}
+          onClose={handleFilterModalClose}
+        >
+          <Box sx={filterModalStyle}>
+            <Filter />
+          </Box>
+        </Modal>
+      </FilterCriteriaContext.Provider>
     </>
   );
 }

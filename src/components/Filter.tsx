@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Container } from "../interfaces/container";
 import { ContainerService } from "../services/containerService";
 import {
@@ -15,19 +15,17 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import {
-  useFilterCriteriaContext,
-  useFilterCriteriaUpdateContext,
-} from "../contexts/filterCriteriaContext";
 import { FilterCriteria } from "../interfaces/filterCriteria";
+import { FilterCriteriaContext } from "../App";
+import { stderr } from "process";
 
 export function Filter() {
   //Contexts
-  const filterCriteria = useFilterCriteriaContext();
-  const updateContext = useFilterCriteriaUpdateContext();
+  const { filterCriteria, setFilterCriteria } = useContext(
+    FilterCriteriaContext
+  );
 
   const [containers, setContainers] = useState<Container[]>([]);
-
   const setContainersList = () => {
     ContainerService.getContainers().then((fetchedContainers: Container[]) => {
       setContainers(fetchedContainers);
@@ -48,8 +46,8 @@ export function Filter() {
       </Typography>
 
       <Stack spacing={3}>
-        {logSourceList(filterCriteria, updateContext)}
-        {containerList(containers, filterCriteria, updateContext)}
+        {logSourceList(filterCriteria, setFilterCriteria)}
+        {containerList(containers, filterCriteria, setFilterCriteria)}
       </Stack>
     </>
   );
@@ -68,21 +66,21 @@ function logSourceList(
   });
 
   const handleStdoutClick = () => {
-    filterCriteria.stdout = !filterCriteria.stdout;
     setSelectedlogStreams({
       ...selectedlogStreams,
-      stdout: filterCriteria.stdout,
+      stdout: !filterCriteria.stdout,
     });
-    filterCriteriaUpdate(filterCriteria);
+    const fcUpdate = { ...filterCriteria, stdout: !filterCriteria.stdout }
+    filterCriteriaUpdate(fcUpdate);
   };
 
   const handleStderrClick = () => {
-    filterCriteria.stderr = !filterCriteria.stderr;
     setSelectedlogStreams({
       ...selectedlogStreams,
-      stderr: filterCriteria.stderr,
+      stderr: !filterCriteria.stderr,
     });
-    filterCriteriaUpdate(filterCriteria);
+    const fcUpdate = { ...filterCriteria, stderr: !filterCriteria.stderr }
+    filterCriteriaUpdate(fcUpdate);
   };
 
   return (
@@ -134,17 +132,18 @@ function containerList(
     const existIndex = selectedContainers.findIndex(
       (c) => c.Id == container.Id
     );
-    console.log("existIndex", existIndex);
+
+    var fcUpdate : FilterCriteria;
     if (existIndex !== -1) {
       selectedContainers = selectedContainers.filter(
         (sc) => sc.Id !== container.Id
       );
-      filterCriteria.selectedContainers = selectedContainers;
+      fcUpdate = {...filterCriteria, selectedContainers}
     } else {
       selectedContainers.push(container);
-      filterCriteria.selectedContainers = selectedContainers;
+      fcUpdate = {...filterCriteria, selectedContainers}
     }
-    filterCriteriaUpdate(filterCriteria);
+    filterCriteriaUpdate(fcUpdate);
     setSelectedContainerIds(selectedContainers.map((c) => c.Id));
   };
   return (
@@ -184,8 +183,9 @@ function containerList(
                       primary={`${container.Names[0].replace(/^\//, "")}`}
                       secondary={
                         <>
-                          <div>State: {container.State}</div>
-                          <div>Image: {container.Image}</div>
+                          <span>State: {container.State}</span>
+                          <br />
+                          <span>Image: {container.Image}</span>
                         </>
                       }
                     />
