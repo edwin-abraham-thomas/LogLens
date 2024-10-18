@@ -68,10 +68,22 @@ function logSourceList(
   });
 
   const handleStdoutClick = () => {
-    filterCriteriaUpdate({...filterCriteria, stdout: false})
-  }
+    filterCriteria.stdout = !filterCriteria.stdout;
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stdout: filterCriteria.stdout,
+    });
+    filterCriteriaUpdate(filterCriteria);
+  };
 
-  // console.log("stream settings stdout: ", filterCriteria.stdout, " stderr: ", filterCriteria.stderr)
+  const handleStderrClick = () => {
+    filterCriteria.stderr = !filterCriteria.stderr;
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stderr: filterCriteria.stderr,
+    });
+    filterCriteriaUpdate(filterCriteria);
+  };
 
   return (
     <Card>
@@ -80,11 +92,9 @@ function logSourceList(
         <FormControlLabel
           control={
             <Checkbox
-              onClick={() =>
-                handleStdoutClick()
-              }
+              onClick={() => handleStdoutClick()}
               edge="start"
-              checked={filterCriteria.stdout}
+              checked={selectedlogStreams.stdout}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stdout" }}
@@ -95,14 +105,9 @@ function logSourceList(
         <FormControlLabel
           control={
             <Checkbox
-              // onClick={() =>
-              //   setFilterCriteria({
-              //     ...filterCriteria,
-              //     stderr: !filterCriteria.stderr,
-              //   })
-              // }
+              onClick={() => handleStderrClick()}
               edge="start"
-              // checked={filterCriteria.stderr}
+              checked={selectedlogStreams.stderr}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stderr" }}
@@ -121,7 +126,7 @@ function containerList(
   filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
 ) {
   const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
-    []
+    filterCriteria.selectedContainers.map((c) => c.Id)
   );
 
   const handleContainerSelection = (container: Container) => {
@@ -142,10 +147,6 @@ function containerList(
     filterCriteriaUpdate(filterCriteria);
     setSelectedContainerIds(selectedContainers.map((c) => c.Id));
   };
-  console.log(
-    "selectedContainers: ",
-    filterCriteria.selectedContainers.map((c) => c.Names[0]).join(" ")
-  );
   return (
     <Card>
       <CardContent>
@@ -181,7 +182,12 @@ function containerList(
                     <ListItemText
                       id={container.Id}
                       primary={`${container.Names[0].replace(/^\//, "")}`}
-                      secondary={`${container.Image}`}
+                      secondary={
+                        <>
+                          <div>State: {container.State}</div>
+                          <div>Image: {container.Image}</div>
+                        </>
+                      }
                     />
                   </ListItemButton>
                 </ListItem>

@@ -1,6 +1,5 @@
 import { createContext, useContext, useState } from "react";
 import { FilterCriteria } from "../interfaces/filterCriteria";
-import { Container } from "../interfaces/container";
 
 const filterCriteriaInitialState: FilterCriteria = {
   selectedContainers: [],
