@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Container } from "../interfaces/container";
 import { ContainerService } from "../services/containerService";
 import {
@@ -15,10 +15,17 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { FilterCriteria } from "../interfaces/filterCriteria";
+import { FilterCriteriaContext } from "../App";
+import { stderr } from "process";
 
 export function Filter() {
-  const [containers, setContainers] = useState<Container[]>([]);
+  //Contexts
+  const { filterCriteria, setFilterCriteria } = useContext(
+    FilterCriteriaContext
+  );
 
+  const [containers, setContainers] = useState<Container[]>([]);
   const setContainersList = () => {
     ContainerService.getContainers().then((fetchedContainers: Container[]) => {
       setContainers(fetchedContainers);
@@ -39,14 +46,43 @@ export function Filter() {
       </Typography>
 
       <Stack spacing={3}>
-        {logSourceList()}
-        {containerList(containers)}
+        {logSourceList(filterCriteria, setFilterCriteria)}
+        {containerList(containers, filterCriteria, setFilterCriteria)}
       </Stack>
     </>
   );
 }
 
-function logSourceList() {
+function logSourceList(
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedlogStreams, setSelectedlogStreams] = useState<{
+    stdout: boolean;
+    stderr: boolean;
+  }>({
+    stdout: filterCriteria.stdout,
+    stderr: filterCriteria.stderr,
+  });
+
+  const handleStdoutClick = () => {
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stdout: !filterCriteria.stdout,
+    });
+    const fcUpdate = { ...filterCriteria, stdout: !filterCriteria.stdout }
+    filterCriteriaUpdate(fcUpdate);
+  };
+
+  const handleStderrClick = () => {
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stderr: !filterCriteria.stderr,
+    });
+    const fcUpdate = { ...filterCriteria, stderr: !filterCriteria.stderr }
+    filterCriteriaUpdate(fcUpdate);
+  };
+
   return (
     <Card>
       <CardContent>
@@ -54,14 +90,9 @@ function logSourceList() {
         <FormControlLabel
           control={
             <Checkbox
-              // onClick={() =>
-              //   setFilterCriteria({
-              //     ...filterCriteria,
-              //     stdout: !filterCriteria.stdout,
-              //   })
-              // }
+              onClick={() => handleStdoutClick()}
               edge="start"
-              // checked={filterCriteria.stdout}
+              checked={selectedlogStreams.stdout}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stdout" }}
@@ -72,14 +103,9 @@ function logSourceList() {
         <FormControlLabel
           control={
             <Checkbox
-              // onClick={() =>
-              //   setFilterCriteria({
-              //     ...filterCriteria,
-              //     stderr: !filterCriteria.stderr,
-              //   })
-              // }
+              onClick={() => handleStderrClick()}
               edge="start"
-              // checked={filterCriteria.stderr}
+              checked={selectedlogStreams.stderr}
               tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stderr" }}
@@ -92,7 +118,34 @@ function logSourceList() {
   );
 }
 
-function containerList(containers: Container[]) {
+function containerList(
+  containers: Container[],
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
+    filterCriteria.selectedContainers.map((c) => c.Id)
+  );
+
+  const handleContainerSelection = (container: Container) => {
+    var selectedContainers = filterCriteria.selectedContainers;
+    const existIndex = selectedContainers.findIndex(
+      (c) => c.Id == container.Id
+    );
+
+    var fcUpdate : FilterCriteria;
+    if (existIndex !== -1) {
+      selectedContainers = selectedContainers.filter(
+        (sc) => sc.Id !== container.Id
+      );
+      fcUpdate = {...filterCriteria, selectedContainers}
+    } else {
+      selectedContainers.push(container);
+      fcUpdate = {...filterCriteria, selectedContainers}
+    }
+    filterCriteriaUpdate(fcUpdate);
+    setSelectedContainerIds(selectedContainers.map((c) => c.Id));
+  };
   return (
     <Card>
       <CardContent>
@@ -112,14 +165,14 @@ function containerList(containers: Container[]) {
               return (
                 <ListItem key={container.Id}>
                   <ListItemButton
-                  // onClick={() => handleOnCheck(container.Id)}
+                    onClick={() => handleContainerSelection(container)}
                   >
                     <ListItemIcon>
                       <Checkbox
                         edge="start"
-                        // checked={
-                        //   selectedContainers.indexOf(container.Id) !== -1
-                        // }
+                        checked={
+                          selectedContainerIds.indexOf(container.Id) !== -1
+                        }
                         tabIndex={-1}
                         disableRipple
                         inputProps={{ "aria-labelledby": container.Id }}
@@ -128,7 +181,13 @@ function containerList(containers: Container[]) {
                     <ListItemText
                       id={container.Id}
                       primary={`${container.Names[0].replace(/^\//, "")}`}
-                      secondary={`${container.Image}`}
+                      secondary={
+                        <>
+                          <span>State: {container.State}</span>
+                          <br />
+                          <span>Image: {container.Image}</span>
+                        </>
+                      }
                     />
                   </ListItemButton>
                 </ListItem>
