@@ -2,12 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import { Container } from "../interfaces/container";
 import { ContainerService } from "../services/containerService";
 import {
-  Backdrop,
   Box,
   Card,
   CardContent,
   Checkbox,
-  CircularProgress,
   FormControlLabel,
   List,
   ListItem,
@@ -19,8 +17,6 @@ import {
 } from "@mui/material";
 import { FilterCriteria } from "../interfaces/filterCriteria";
 import { FilterCriteriaContext } from "../App";
-
-var loading: boolean = false;
 
 export function Filter() {
   //Contexts
@@ -52,13 +48,6 @@ export function Filter() {
         {logSourceList(filterCriteria, setFilterCriteria)}
         {containerList(containers, filterCriteria, setFilterCriteria)}
       </Stack>
-
-      {/* <Backdrop
-        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop> */}
     </>
   );
 }
@@ -155,7 +144,6 @@ function containerList(
     }
     filterCriteriaUpdate(fcUpdate);
     setSelectedContainerIds(selectedContainers.map((c) => c.Id));
-    startLoading(10);
   };
   return (
     <Card>
@@ -209,10 +197,4 @@ function containerList(
       </CardContent>
     </Card>
   );
-}
-
-function startLoading(timeout: number = 50) {
-  loading = true;
-
-  setTimeout(() => (loading = false), timeout);
 }

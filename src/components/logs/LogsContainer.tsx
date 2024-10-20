@@ -2,30 +2,22 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { FilterCriteriaContext } from "../../App";
 import { Log } from "../../interfaces/log";
 import { LogService } from "../../services/logService";
-import { ExecProcess } from "@docker/extension-api-client-types/dist/v1";
 
 export function LogsContainer() {
   //Contexts
-  const { filterCriteria } = useContext(FilterCriteriaContext);
+  const { filterCriteria, refreshEvent } = useContext(FilterCriteriaContext);
 
   const [logs, setLogs] = useState<Log[]>([]);
   const logsRef = useRef<Log[]>([]);
   logsRef.current = logs;
 
   useEffect(() => {
-    var listeners: ExecProcess[];
-    console.log("setting listener");
-    listeners = LogService.setLogListeners(filterCriteria, logsRef, setLogs);
+    console.log("refreshing");
+    LogService.getLogs(filterCriteria, logsRef, setLogs)
 
     return () => {
-      listeners.forEach((listener) => {
-        listener.close();
-      });
-      console.log("clearing listeners");
-      // setLogs([])
-      // logsRef.current = [];
     };
-  }, [filterCriteria]);
+  }, [filterCriteria, refreshEvent]);
 
   return (
     <>

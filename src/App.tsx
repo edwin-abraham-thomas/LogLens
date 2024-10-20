@@ -1,10 +1,12 @@
 import "./styles.css";
 import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { Filter } from "./components/Filter";
 import { FilterList } from "@mui/icons-material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { LogsContainer } from "./components/logs/LogsContainer";
+import { Constants } from "./constants";
 
 // Context setup
 const filterCriteriaInitialState: FilterCriteria = {
@@ -15,10 +17,12 @@ const filterCriteriaInitialState: FilterCriteria = {
 type FCContextType = {
   filterCriteria: FilterCriteria;
   setFilterCriteria: (filterCriteria: FilterCriteria) => void;
+  refreshEvent: boolean;
 };
 export const FilterCriteriaContext = createContext<FCContextType>({
   filterCriteria: filterCriteriaInitialState,
   setFilterCriteria: () => {},
+  refreshEvent: false,
 });
 
 export function App() {
@@ -32,23 +36,60 @@ export function App() {
     borderColor: "secondary.main",
     maxHeight: "80vh",
   };
-  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(true);
+  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
   const handleFilterModalClose = () => setFilterModalOpen(false);
   const handleFilterModalOpen = () => setFilterModalOpen(true);
 
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
     filterCriteriaInitialState
   );
+  const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
+
+  useEffect(() => {
+    const presetFilterCriteriaString = localStorage.getItem(
+      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
+    );
+    console.log("checking for preset filter");
+    if (
+      presetFilterCriteriaString !== null &&
+      presetFilterCriteriaString !== "" &&
+      presetFilterCriteriaString !== undefined
+    ) {
+      const presetFilter = JSON.parse(presetFilterCriteriaString);
+      console.log("setting preset filter", presetFilter);
+      setFilterCriteria(presetFilter);
+    } else {
+      console.log("setting default filter");
+      setFilterCriteria(filterCriteriaInitialState);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (filterCriteria === null || filterCriteria === undefined || filterCriteria == filterCriteriaInitialState) {
+      return;
+    }
+    console.log("storing into localstorage", filterCriteria);
+    localStorage.setItem(
+      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
+      JSON.stringify(filterCriteria)
+    );
+  }, [filterCriteria]);
 
   return (
     <>
       <FilterCriteriaContext.Provider
-        value={{ filterCriteria, setFilterCriteria }}
+        value={{ filterCriteria, setFilterCriteria, refreshEvent }}
       >
         <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
           <div className="flex items-center">
             <Typography variant="h2">Log Lens</Typography>
             <div className="spacer"></div>
+            <IconButton
+              aria-label="filter"
+              onClick={() => setRefreshEvent(!refreshEvent)}
+            >
+              <RefreshIcon />
+            </IconButton>
             <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
               <FilterList />
             </IconButton>
