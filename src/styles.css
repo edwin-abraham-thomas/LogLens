@@ -2,13 +2,18 @@
   display: flex;
 }
 
-.flex-row {
+.flex-column {
   flex-direction: column;
 }
 
 .flex-center {
   align-items: center;
   justify-content: center;
+}
+
+.flex-top-right {
+  align-items: start;
+  justify-content: end;
 }
 
 .items-center {

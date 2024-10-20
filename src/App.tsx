@@ -95,8 +95,8 @@ export function App() {
         </Box>
 
         <Modal
-          sx={{ position: "fixed", zIndex: 9999 }}
-          className="flex flex-center"
+          sx={{ position: "fixed", zIndex: 9999, paddingTop: "4rem", paddingRight: "3rem" }}
+          className="flex flex-top-right"
           open={filterModalOpen}
           onClose={handleFilterModalClose}
         >

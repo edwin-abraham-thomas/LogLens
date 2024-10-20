@@ -1,16 +1,12 @@
-import {
-  ExecResult,
-} from "@docker/extension-api-client-types/dist/v1";
+import { ExecResult } from "@docker/extension-api-client-types/dist/v1";
 import { Log } from "../interfaces/log";
 import { FilterCriteria } from "../interfaces/filterCriteria";
-import { MutableRefObject } from "react";
 import { DdClientProvider } from "./ddClientProvider";
 import { LogParser } from "./logParser";
 
 export class LogService {
   public static getLogs(
     filter: FilterCriteria,
-    logs: MutableRefObject<Log[]>,
     setLogs: (current: Log[]) => void
   ) {
     const ddClient = DdClientProvider.getClient();
@@ -54,10 +50,10 @@ export class LogService {
           }
         }
 
-        const sortedLogs = allLogs.sort(
-          (a, b) => b.timestamp?.getTime() - a.timestamp?.getTime()
-        );
-        setLogs(sortedLogs);
+        // const sortedLogs = allLogs.sort(
+        //   (a, b) => b.timestamp?.getTime() - a.timestamp?.getTime()
+        // );
+        setLogs(allLogs);
       })
       .catch((error) => {
         console.log("Error occured", error);

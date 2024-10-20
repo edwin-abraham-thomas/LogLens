@@ -7,11 +7,6 @@ import {
   CardContent,
   Checkbox,
   FormControlLabel,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Stack,
   Typography,
 } from "@mui/material";
@@ -25,14 +20,42 @@ export function Filter() {
   );
 
   const [containers, setContainers] = useState<Container[]>([]);
-  const setContainersList = () => {
+  const setContainersList = (syncFC: boolean = false) => {
     ContainerService.getContainers().then((fetchedContainers: Container[]) => {
       setContainers(fetchedContainers);
+
+      if (syncFC) {
+        const nonExistantContainers: Container[] = [];
+
+        filterCriteria.selectedContainers?.map((sc) => {
+          if (fetchedContainers.findIndex((fc) => fc.Id === sc.Id) === -1) {
+            nonExistantContainers.push(sc);
+          }
+        });
+        const fcSelectedContainersUpdate =
+          filterCriteria.selectedContainers.filter(
+            (sc) =>
+              nonExistantContainers.findIndex((nec) => nec.Id === sc.Id) === -1
+          );
+        const fcUpdate = {
+          ...filterCriteria,
+          selectedContainers: fcSelectedContainersUpdate,
+        };
+        console.log(
+          "filterCriteria: ",
+          filterCriteria,
+          " fcUpdate: ",
+          fcUpdate,
+          " nonExistantContainers: ",
+          nonExistantContainers
+        );
+        setFilterCriteria(fcUpdate);
+      }
     });
   };
 
   useEffect(() => {
-    setContainersList();
+    setContainersList(true);
     setInterval(() => {
       setContainersList();
     }, 1000);
@@ -146,55 +169,34 @@ function containerList(
     setSelectedContainerIds(selectedContainers.map((c) => c.Id));
   };
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
-          Containers
-        </Typography>
-        <Box
-          sx={{
-            width: "100%",
-            maxHeight: "50vh",
-            bgcolor: "primary.dark",
-            overflow: "auto",
-          }}
-        >
-          <List sx={{ bgcolor: "background.paper" }} dense>
-            {containers.map((container) => {
+    <>
+      <Card>
+        <CardContent>
+          <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
+            Containers
+          </Typography>
+          <div className="flex flex-column">
+            {containers.map((c) => {
               return (
-                <ListItem key={container.Id}>
-                  <ListItemButton
-                    onClick={() => handleContainerSelection(container)}
-                  >
-                    <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={
-                          selectedContainerIds.indexOf(container.Id) !== -1
-                        }
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ "aria-labelledby": container.Id }}
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      id={container.Id}
-                      primary={`${container.Names[0].replace(/^\//, "")}`}
-                      secondary={
-                        <>
-                          <span>State: {container.State}</span>
-                          <br />
-                          <span>Image: {container.Image}</span>
-                        </>
-                      }
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={() => handleContainerSelection(c)}
+                      checked={selectedContainerIds.indexOf(c.Id) !== -1}
+                      edge="start"
+                      tabIndex={-1}
+                      inputProps={{
+                        "aria-labelledby": c.Names[0].replace(/^\//, ""),
+                      }}
                     />
-                  </ListItemButton>
-                </ListItem>
+                  }
+                  label={c.Names[0].replace(/^\//, "")}
+                />
               );
             })}
-          </List>
-        </Box>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </>
   );
 }
