@@ -1,7 +1,7 @@
-import { Box, Typography } from "@mui/material";
-import { Log } from "../interfaces/log";
+import { Typography } from "@mui/material";
 import { useEffect } from "react";
-import { LogParser } from "../services/logParser";
+import { Log } from "../../interfaces/log";
+import { LogParser } from "../../services/logParser";
 
 type prop = {
   log: Log;

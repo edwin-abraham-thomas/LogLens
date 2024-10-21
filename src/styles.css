@@ -2,7 +2,7 @@
   display: flex;
 }
 
-.flex-row {
+.flex-column {
   flex-direction: column;
 }
 
@@ -11,14 +11,19 @@
   justify-content: center;
 }
 
+.flex-top-right {
+  align-items: start;
+  justify-content: end;
+}
+
 .items-center {
   align-items: center;
 }
 
-.spacer {
-  flex: 1 1 auto;
+.gap{
+  gap: 1rem;
 }
 
-.app-header {
-  margin: 0;
+.spacer {
+  flex: 1 1 auto;
 }

@@ -8,9 +8,9 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { Log } from "../interfaces/log";
+import { LogDetails } from "./logDetails";
 import { useState } from "react";
-import { LogDetails } from "./LogDetails";
+import { Log } from "../../interfaces/log";
 
 interface DrawerState {
   open: boolean;
@@ -35,8 +35,10 @@ export function LogsTable({ logs }: prop) {
         <Table stickyHeader size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ minWidth: "15rem" }}>Timestamp</TableCell>
-              <TableCell sx={{ minWidth: "25rem" }} align="left">Container</TableCell>
+              <TableCell sx={{ minWidth: "18rem" }}>Timestamp</TableCell>
+              <TableCell sx={{ minWidth: "25rem" }} align="left">
+                Container
+              </TableCell>
               <TableCell align="left">Message</TableCell>
             </TableRow>
           </TableHead>
@@ -55,7 +57,7 @@ export function LogsTable({ logs }: prop) {
                     hour: "2-digit",
                     minute: "2-digit",
                     second: "2-digit",
-                    fractionalSecondDigits: 3
+                    fractionalSecondDigits: 3,
                   })}
                 </TableCell>
                 <TableCell align="left">{log.containerName}</TableCell>

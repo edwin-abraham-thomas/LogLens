@@ -1,168 +1,202 @@
-import { DockerDesktopClient } from "@docker/extension-api-client-types/dist/v1";
-import { BorderAllOutlined, FilterList } from "@mui/icons-material";
+import { useContext, useEffect, useState } from "react";
+import { Container } from "../interfaces/container";
+import { ContainerService } from "../services/containerService";
 import {
   Box,
   Card,
   CardContent,
   Checkbox,
   FormControlLabel,
-  Modal,
   Stack,
   Typography,
 } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import { useEffect, useState } from "react";
-import { Container } from "../interfaces/container";
-import { DockerContainers } from "./DockerContainers";
 import { FilterCriteria } from "../interfaces/filterCriteria";
+import { FilterCriteriaContext } from "../App";
 
-const modalStyle = {
-  width: 600,
-  padding: "1rem",
-  bgcolor: "background.default",
-  borderRadius: 1,
-  border: "solid",
-  borderColor: "secondary.main",
-  maxHeight: "80vh",
-};
-
-type prop = {
-  ddClient: DockerDesktopClient;
-  setFilterCriteria: (filterCriteria: FilterCriteria) => void;
-  filterCriteria: FilterCriteria;
-};
-
-export function Filter({ ddClient, setFilterCriteria, filterCriteria }: prop) {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const [containers, setContainers] = useState<Container[]>([]);
-  const [selectedContainerIds, setselectedContainerIds] = useState<string[]>(
-    []
+export function Filter() {
+  //Contexts
+  const { filterCriteria, setFilterCriteria } = useContext(
+    FilterCriteriaContext
   );
 
-  let isFirstRender: boolean = true;
-
-  const refreshContainerList = () => {
-    ddClient.docker.listContainers().then((containers) => {
-      const fetchedContainers = containers as Container[];
+  const [containers, setContainers] = useState<Container[]>([]);
+  const setContainersList = (syncFC: boolean = false) => {
+    ContainerService.getContainers().then((fetchedContainers: Container[]) => {
       setContainers(fetchedContainers);
-      if (isFirstRender) {
-        console.log("setting selectedContainerIds");
-        setselectedContainerIds(
-          filterCriteria.selectedContainers.map((c) => c.Id)
-        );
-        isFirstRender = false;
-      }
 
-      console.log("refreshed container list");
+      if (syncFC) {
+        const nonExistantContainers: Container[] = [];
+
+        filterCriteria.selectedContainers?.map((sc) => {
+          if (fetchedContainers.findIndex((fc) => fc.Id === sc.Id) === -1) {
+            nonExistantContainers.push(sc);
+          }
+        });
+        const fcSelectedContainersUpdate =
+          filterCriteria.selectedContainers.filter(
+            (sc) =>
+              nonExistantContainers.findIndex((nec) => nec.Id === sc.Id) === -1
+          );
+        const fcUpdate = {
+          ...filterCriteria,
+          selectedContainers: fcSelectedContainersUpdate,
+        };
+        console.log(
+          "filterCriteria: ",
+          filterCriteria,
+          " fcUpdate: ",
+          fcUpdate,
+          " nonExistantContainers: ",
+          nonExistantContainers
+        );
+        setFilterCriteria(fcUpdate);
+      }
     });
   };
 
   useEffect(() => {
+    setContainersList(true);
     setInterval(() => {
-      refreshContainerList();
+      setContainersList();
     }, 1000);
   }, []);
 
-  useEffect(() => {
-    const selectedContainers = containers.filter((c) =>
-      selectedContainerIds.includes(c.Id)
-    );
-    const filterCriteriaUpdate = {
-      ...filterCriteria,
-      selectedContainers: selectedContainers,
-    };
-    console.log("Filter useEffect selectedContainerIds - ", {
-      filterCriteriaUpdate,
-      selectedContainerIds,
-    });
-    setFilterCriteria(filterCriteriaUpdate);
-  }, [selectedContainerIds]);
-
   return (
     <>
-      <IconButton onClick={handleOpen} aria-label="filter">
-        <FilterList />
-      </IconButton>
+      <Typography sx={{ marginBottom: "2rem" }} variant="h2">
+        Filter
+      </Typography>
 
-      <Modal
-        sx={{ position: "fixed", zIndex: 9999 }}
-        className="flex flex-center"
-        open={open}
-        onClose={handleClose}
-      >
-        <Box sx={modalStyle}>
-          <Typography sx={{ marginBottom: "2rem" }} variant="h2">
-            Filter
-          </Typography>
-
-          <Stack spacing={3}>
-            {/* <Card> */}
-              <CardContent>
-                {LogSourceList(filterCriteria, setFilterCriteria)}
-              </CardContent>
-            {/* </Card> */}
-            {/* <Card> */}
-              <CardContent>
-                <DockerContainers
-                  containers={containers}
-                  setselectedContainers={setselectedContainerIds}
-                  selectedContainers={selectedContainerIds}
-                ></DockerContainers>
-              </CardContent>
-            {/* </Card> */}
-          </Stack>
-        </Box>
-      </Modal>
+      <Stack spacing={3}>
+        {logSourceList(filterCriteria, setFilterCriteria)}
+        {containerList(containers, filterCriteria, setFilterCriteria)}
+      </Stack>
     </>
   );
 }
 
-function LogSourceList(
+function logSourceList(
   filterCriteria: FilterCriteria,
-  setFilterCriteria: (filterCriteria: FilterCriteria) => void
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
 ) {
+  const [selectedlogStreams, setSelectedlogStreams] = useState<{
+    stdout: boolean;
+    stderr: boolean;
+  }>({
+    stdout: filterCriteria.stdout,
+    stderr: filterCriteria.stderr,
+  });
+
+  const handleStdoutClick = () => {
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stdout: !filterCriteria.stdout,
+    });
+    const fcUpdate = { ...filterCriteria, stdout: !filterCriteria.stdout };
+    filterCriteriaUpdate(fcUpdate);
+  };
+
+  const handleStderrClick = () => {
+    setSelectedlogStreams({
+      ...selectedlogStreams,
+      stderr: !filterCriteria.stderr,
+    });
+    const fcUpdate = { ...filterCriteria, stderr: !filterCriteria.stderr };
+    filterCriteriaUpdate(fcUpdate);
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="subtitle1">Source</Typography>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onClick={() => handleStdoutClick()}
+              edge="start"
+              checked={selectedlogStreams.stdout}
+              tabIndex={-1}
+              disableRipple
+              inputProps={{ "aria-labelledby": "stdout" }}
+            />
+          }
+          label="stdout"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              onClick={() => handleStderrClick()}
+              edge="start"
+              checked={selectedlogStreams.stderr}
+              tabIndex={-1}
+              disableRipple
+              inputProps={{ "aria-labelledby": "stderr" }}
+            />
+          }
+          label="stderr"
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+function containerList(
+  containers: Container[],
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
+    filterCriteria.selectedContainers.map((c) => c.Id)
+  );
+
+  const handleContainerSelection = (container: Container) => {
+    var selectedContainers = filterCriteria.selectedContainers;
+    const existIndex = selectedContainers.findIndex(
+      (c) => c.Id == container.Id
+    );
+
+    var fcUpdate: FilterCriteria;
+    if (existIndex !== -1) {
+      selectedContainers = selectedContainers.filter(
+        (sc) => sc.Id !== container.Id
+      );
+      fcUpdate = { ...filterCriteria, selectedContainers };
+    } else {
+      selectedContainers.push(container);
+      fcUpdate = { ...filterCriteria, selectedContainers };
+    }
+    filterCriteriaUpdate(fcUpdate);
+    setSelectedContainerIds(selectedContainers.map((c) => c.Id));
+  };
   return (
     <>
-      <Typography variant="subtitle1">Source</Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  onClick={() =>
-                    setFilterCriteria({
-                      ...filterCriteria,
-                      stdout: !filterCriteria.stdout,
-                    })
+      <Card>
+        <CardContent>
+          <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
+            Containers
+          </Typography>
+          <div className="flex flex-column">
+            {containers.map((c) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={() => handleContainerSelection(c)}
+                      checked={selectedContainerIds.indexOf(c.Id) !== -1}
+                      edge="start"
+                      tabIndex={-1}
+                      inputProps={{
+                        "aria-labelledby": c.Names[0].replace(/^\//, ""),
+                      }}
+                    />
                   }
-                  edge="start"
-                  checked={filterCriteria.stdout}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{ "aria-labelledby": "stdout" }}
+                  label={c.Names[0].replace(/^\//, "")}
                 />
-              }
-              label="stdout"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  onClick={() =>
-                    setFilterCriteria({
-                      ...filterCriteria,
-                      stderr: !filterCriteria.stderr,
-                    })
-                  }
-                  edge="start"
-                  checked={filterCriteria.stderr}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{ "aria-labelledby": "stderr" }}
-                />
-              }
-              label="stderr"
-            />
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
