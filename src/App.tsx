@@ -1,51 +1,83 @@
-import { createDockerDesktopClient } from "@docker/extension-api-client";
-import Divider from "@mui/material/Divider";
 import "./styles.css";
-import { Filter } from "./components/Filter";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
-import { LogsContainer } from "./components/LogsContainer";
-import { Box, IconButton, Typography } from "@mui/material";
-import { Constants } from "./constants";
+import { Filter } from "./components/Filter";
+import { FilterList } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { LogsContainer } from "./components/logs/LogsContainer";
+import { Constants } from "./constants";
 
-const client = createDockerDesktopClient();
-function useDockerDesktopClient() {
-  return client;
-}
+// Context setup
+const filterCriteriaInitialState: FilterCriteria = {
+  selectedContainers: [],
+  stdout: true,
+  stderr: true,
+};
+type FCContextType = {
+  filterCriteria: FilterCriteria;
+  setFilterCriteria: (filterCriteria: FilterCriteria) => void;
+  refreshEvent: boolean;
+};
+export const FilterCriteriaContext = createContext<FCContextType>({
+  filterCriteria: filterCriteriaInitialState,
+  setFilterCriteria: () => {},
+  refreshEvent: false,
+});
 
 export function App() {
-  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>();
-  const [logsRefreshTrigger, setLogsRefreshTrigger] = useState<boolean>(false);
+  //Filter modal settings
+  const filterModalStyle = {
+    width: 600,
+    padding: "1rem",
+    bgcolor: "background.default",
+    borderRadius: 1,
+    border: "solid",
+    borderColor: "secondary.main",
+    maxHeight: "80vh",
+  };
+  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+  const handleFilterModalClose = () => setFilterModalOpen(false);
+  const handleFilterModalOpen = () => setFilterModalOpen(true);
+
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
+    filterCriteriaInitialState
+  );
+  const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
+
+  const [searchText, setSearchText] = useState<string>("");
 
   useEffect(() => {
     const presetFilterCriteriaString = localStorage.getItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
     );
-    console.log("checking for preset filter");
     if (
       presetFilterCriteriaString !== null &&
       presetFilterCriteriaString !== "" &&
       presetFilterCriteriaString !== undefined
     ) {
       const presetFilter = JSON.parse(presetFilterCriteriaString);
-      console.log("setting preset filter", presetFilter);
       setFilterCriteria(presetFilter);
     } else {
-      console.log("setting default filter");
-      setFilterCriteria({
-        selectedContainers: [],
-        stderr: true,
-        stdout: true,
-      });
+      setFilterCriteria(filterCriteriaInitialState);
     }
   }, []);
 
   useEffect(() => {
-    if (filterCriteria === null || filterCriteria === undefined) {
+    if (
+      filterCriteria === null ||
+      filterCriteria === undefined ||
+      filterCriteria == filterCriteriaInitialState
+    ) {
       return;
     }
-    console.log("storing into localstorage", filterCriteria);
     localStorage.setItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
       JSON.stringify(filterCriteria)
@@ -53,30 +85,52 @@ export function App() {
   }, [filterCriteria]);
 
   return (
-    <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
-      <div className="flex items-center">
-        <Typography variant="h2">Log Lens</Typography>
-        <div className="spacer"></div>
-        <IconButton
-          aria-label="filter"
-          onClick={() => setLogsRefreshTrigger(!logsRefreshTrigger)}
+    <>
+      <FilterCriteriaContext.Provider
+        value={{ filterCriteria, setFilterCriteria, refreshEvent }}
+      >
+        <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
+          <div className="flex items-center gap">
+            <Typography variant="h2">Log Lens</Typography>
+            <div className="spacer"></div>
+            <TextField
+              sx={{ width: "30rem" }}
+              placeholder={"Search"}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+            <IconButton
+              aria-label="filter"
+              onClick={() => setRefreshEvent(!refreshEvent)}
+            >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton
+              aria-label="filter"
+              onClick={handleFilterModalOpen}
+            >
+              <FilterList />
+            </IconButton>
+          </div>
+          <Divider />
+          <LogsContainer searchText={searchText} />
+        </Box>
+
+        <Modal
+          sx={{
+            position: "fixed",
+            zIndex: 9999,
+            paddingTop: "4rem",
+            paddingRight: "3rem",
+          }}
+          className="flex flex-top-right"
+          open={filterModalOpen}
+          onClose={handleFilterModalClose}
         >
-          <RefreshIcon />
-        </IconButton>
-        {filterCriteria && (
-          <Filter
-            ddClient={useDockerDesktopClient()}
-            setFilterCriteria={setFilterCriteria}
-            filterCriteria={filterCriteria}
-          />
-        )}
-      </div>
-      <Divider />
-      <LogsContainer
-        ddClient={useDockerDesktopClient()}
-        filterCriteria={filterCriteria}
-        refreshtrigger={logsRefreshTrigger}
-      />
-    </Box>
+          <Box sx={filterModalStyle}>
+            <Filter />
+          </Box>
+        </Modal>
+      </FilterCriteriaContext.Provider>
+    </>
   );
 }

@@ -18,7 +18,8 @@
     "build": "tsc && vite build",
     "install-extension": "make install-extension",
     "update-extension": "make update-extension",
-    "attach-localhost": "make attach-localhost"
+    "attach-localhost": "make attach-localhost",
+    "reset-localhost": "make reset-localhost"
   },
   "devDependencies": {
     "@docker/extension-api-client-types": "0.3.4",
