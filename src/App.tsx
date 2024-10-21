@@ -1,5 +1,12 @@
 import "./styles.css";
-import { Box, Divider, IconButton, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { Filter } from "./components/Filter";
@@ -45,6 +52,8 @@ export function App() {
   );
   const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
 
+  const [searchText, setSearchText] = useState<string>("");
+
   useEffect(() => {
     const presetFilterCriteriaString = localStorage.getItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
@@ -62,7 +71,11 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (filterCriteria === null || filterCriteria === undefined || filterCriteria == filterCriteriaInitialState) {
+    if (
+      filterCriteria === null ||
+      filterCriteria === undefined ||
+      filterCriteria == filterCriteriaInitialState
+    ) {
       return;
     }
     localStorage.setItem(
@@ -77,25 +90,38 @@ export function App() {
         value={{ filterCriteria, setFilterCriteria, refreshEvent }}
       >
         <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
-          <div className="flex items-center">
+          <div className="flex items-center gap">
             <Typography variant="h2">Log Lens</Typography>
             <div className="spacer"></div>
+            <TextField
+              sx={{ width: "30rem" }}
+              placeholder={"Search"}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
             <IconButton
               aria-label="filter"
               onClick={() => setRefreshEvent(!refreshEvent)}
             >
               <RefreshIcon />
             </IconButton>
-            <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
+            <IconButton
+              aria-label="filter"
+              onClick={handleFilterModalOpen}
+            >
               <FilterList />
             </IconButton>
           </div>
           <Divider />
-          <LogsContainer />
+          <LogsContainer searchText={searchText} />
         </Box>
 
         <Modal
-          sx={{ position: "fixed", zIndex: 9999, paddingTop: "4rem", paddingRight: "3rem" }}
+          sx={{
+            position: "fixed",
+            zIndex: 9999,
+            paddingTop: "4rem",
+            paddingRight: "3rem",
+          }}
           className="flex flex-top-right"
           open={filterModalOpen}
           onClose={handleFilterModalClose}

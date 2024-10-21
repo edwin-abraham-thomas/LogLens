@@ -50,10 +50,12 @@ export class LogService {
           }
         }
 
-        // const sortedLogs = allLogs.sort(
-        //   (a, b) => b.timestamp?.getTime() - a.timestamp?.getTime()
-        // );
-        setLogs(allLogs);
+        const sortedLogs = allLogs.sort(
+          (a, b) => a.timestamp?.getTime() - b.timestamp?.getTime()
+        )
+        .reverse();
+
+        setLogs(sortedLogs);
       })
       .catch((error) => {
         console.log("Error occured", error);

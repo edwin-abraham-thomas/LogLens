@@ -20,10 +20,10 @@
   align-items: center;
 }
 
-.spacer {
-  flex: 1 1 auto;
+.gap{
+  gap: 1rem;
 }
 
-.app-header {
-  margin: 0;
+.spacer {
+  flex: 1 1 auto;
 }
