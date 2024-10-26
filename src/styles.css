@@ -20,10 +20,21 @@
   align-items: center;
 }
 
-.gap{
+.gap-1 {
   gap: 1rem;
 }
 
 .spacer {
   flex: 1 1 auto;
+}
+
+.pre {
+  white-space: pre;
+}
+
+@keyframes spin { 
+  100% { 
+      -webkit-transform: rotate(360deg); 
+      transform:rotate(360deg); 
+  } 
 }

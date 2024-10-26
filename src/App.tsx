@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
-import { Filter } from "./components/Filter";
+import { Filter } from "./components/filter/Filter";
 import { FilterList } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { LogsContainer } from "./components/logs/LogsContainer";
@@ -35,7 +35,7 @@ export const FilterCriteriaContext = createContext<FCContextType>({
 export function App() {
   //Filter modal settings
   const filterModalStyle = {
-    width: 600,
+    minWidth: "16rem",
     padding: "1rem",
     bgcolor: "background.default",
     borderRadius: 1,
@@ -90,7 +90,7 @@ export function App() {
         value={{ filterCriteria, setFilterCriteria, refreshEvent }}
       >
         <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
-          <div className="flex items-center gap">
+          <div className="flex items-center gap-1">
             <Typography variant="h2">Log Lens</Typography>
             <div className="spacer"></div>
             <TextField

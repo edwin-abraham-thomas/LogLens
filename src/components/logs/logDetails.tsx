@@ -8,9 +8,6 @@ type prop = {
 };
 
 export function LogDetails({ log }: prop) {
-  useEffect(() => {
-    console.log(log);
-  }, []);
 
   return (
     <>

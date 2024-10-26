@@ -8,7 +8,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { LogDetails } from "./logDetails";
+import { LogDetails } from "./LogDetails";
 import { useState } from "react";
 import { Log } from "../../interfaces/log";
 
@@ -35,11 +35,11 @@ export function LogsTable({ logs }: prop) {
         <Table stickyHeader size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ minWidth: "18rem" }}>Timestamp</TableCell>
-              <TableCell sx={{ minWidth: "25rem" }} align="left">
+              <TableCell sx={{ minWidth: "18rem" }} variant="head">Timestamp</TableCell>
+              <TableCell sx={{ minWidth: "25rem" }} align="left" variant="head">
                 Container
               </TableCell>
-              <TableCell align="left">Message</TableCell>
+              <TableCell align="left" variant="head">Message</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -49,7 +49,7 @@ export function LogsTable({ logs }: prop) {
                 key={index}
                 onClick={toggleDrawer({ open: true, log: log })}
               >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" variant="body">
                   {log.timestamp.toLocaleString(undefined, {
                     year: "numeric",
                     month: "2-digit",
@@ -60,8 +60,8 @@ export function LogsTable({ logs }: prop) {
                     fractionalSecondDigits: 3,
                   })}
                 </TableCell>
-                <TableCell align="left">{log.containerName}</TableCell>
-                <TableCell align="left">{log.log}</TableCell>
+                <TableCell align="left" variant="body">{log.containerName}</TableCell>
+                <TableCell align="left" variant="body" className="pre">{log.log}</TableCell>
               </TableRow>
             ))}
           </TableBody>

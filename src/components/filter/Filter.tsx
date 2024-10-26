@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { Container } from "../interfaces/container";
-import { ContainerService } from "../services/containerService";
+import { Container } from "../../interfaces/container";
+import { ContainerService } from "../../services/containerService";
 import {
-  Box,
   Card,
   CardContent,
   Checkbox,
@@ -10,8 +9,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FilterCriteria } from "../interfaces/filterCriteria";
-import { FilterCriteriaContext } from "../App";
+import { FilterCriteria } from "../../interfaces/filterCriteria";
+import { FilterCriteriaContext } from "../../App";
+import { ContainerStatusIcon } from "../icons/ContainerStatusIcon";
 
 export function Filter() {
   //Contexts
@@ -26,7 +26,6 @@ export function Filter() {
 
       if (syncFC) {
         const nonExistantContainers: Container[] = [];
-
         filterCriteria.selectedContainers?.map((sc) => {
           if (fetchedContainers.findIndex((fc) => fc.Id === sc.Id) === -1) {
             nonExistantContainers.push(sc);
@@ -41,14 +40,6 @@ export function Filter() {
           ...filterCriteria,
           selectedContainers: fcSelectedContainersUpdate,
         };
-        console.log(
-          "filterCriteria: ",
-          filterCriteria,
-          " fcUpdate: ",
-          fcUpdate,
-          " nonExistantContainers: ",
-          nonExistantContainers
-        );
         setFilterCriteria(fcUpdate);
       }
     });
@@ -68,9 +59,91 @@ export function Filter() {
       </Typography>
 
       <Stack spacing={3}>
-        {logSourceList(filterCriteria, setFilterCriteria)}
         {containerList(containers, filterCriteria, setFilterCriteria)}
+        {logSourceList(filterCriteria, setFilterCriteria)}
       </Stack>
+    </>
+  );
+}
+
+function containerList(
+  containers: Container[],
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
+    filterCriteria.selectedContainers.map((c) => c.Id)
+  );
+
+  const handleContainerSelection = (container: Container) => {
+    var selectedContainers = filterCriteria.selectedContainers;
+    const existIndex = selectedContainers.findIndex(
+      (c) => c.Id == container.Id
+    );
+
+    var fcUpdate: FilterCriteria;
+    if (existIndex !== -1) {
+      selectedContainers = selectedContainers.filter(
+        (sc) => sc.Id !== container.Id
+      );
+      fcUpdate = { ...filterCriteria, selectedContainers };
+    } else {
+      selectedContainers.push(container);
+      fcUpdate = { ...filterCriteria, selectedContainers };
+    }
+    filterCriteriaUpdate(fcUpdate);
+    setSelectedContainerIds(selectedContainers.map((c) => c.Id));
+  };
+  return (
+    <>
+      <Card>
+        <CardContent
+          sx={{
+            overflow: "auto",
+            maxHeight: "35rem",
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
+            Containers
+          </Typography>
+          <div className="flex flex-column">
+            {containers.map((c) => {
+              return (
+                <FormControlLabel
+                key={c.Id}
+                  control={
+                    <Checkbox
+                      onClick={() => handleContainerSelection(c)}
+                      checked={selectedContainerIds.indexOf(c.Id) !== -1}
+                      edge="start"
+                      tabIndex={-1}
+                      inputProps={{
+                        "aria-labelledby": c.Names[0].replace(/^\//, ""),
+                      }}
+                    />
+                  }
+                  label={
+                    <>
+                      <div className="flex gap-1">
+                        <ContainerStatusIcon rotate={c.State == "running"} />
+                        <Typography variant="body1">
+                          {c.Names[0].replace(/^\//, "")}
+                        </Typography>
+                        <Typography
+                          sx={{ color: "text.secondary" }}
+                          variant="body1"
+                        >
+                          {c.Image}
+                        </Typography>
+                      </div>
+                    </>
+                  }
+                />
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
@@ -140,63 +213,3 @@ function logSourceList(
   );
 }
 
-function containerList(
-  containers: Container[],
-  filterCriteria: FilterCriteria,
-  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
-) {
-  const [selectedContainerIds, setSelectedContainerIds] = useState<string[]>(
-    filterCriteria.selectedContainers.map((c) => c.Id)
-  );
-
-  const handleContainerSelection = (container: Container) => {
-    var selectedContainers = filterCriteria.selectedContainers;
-    const existIndex = selectedContainers.findIndex(
-      (c) => c.Id == container.Id
-    );
-
-    var fcUpdate: FilterCriteria;
-    if (existIndex !== -1) {
-      selectedContainers = selectedContainers.filter(
-        (sc) => sc.Id !== container.Id
-      );
-      fcUpdate = { ...filterCriteria, selectedContainers };
-    } else {
-      selectedContainers.push(container);
-      fcUpdate = { ...filterCriteria, selectedContainers };
-    }
-    filterCriteriaUpdate(fcUpdate);
-    setSelectedContainerIds(selectedContainers.map((c) => c.Id));
-  };
-  return (
-    <>
-      <Card>
-        <CardContent>
-          <Typography variant="subtitle1" sx={{ marginBottom: "1rem" }}>
-            Containers
-          </Typography>
-          <div className="flex flex-column">
-            {containers.map((c) => {
-              return (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onClick={() => handleContainerSelection(c)}
-                      checked={selectedContainerIds.indexOf(c.Id) !== -1}
-                      edge="start"
-                      tabIndex={-1}
-                      inputProps={{
-                        "aria-labelledby": c.Names[0].replace(/^\//, ""),
-                      }}
-                    />
-                  }
-                  label={c.Names[0].replace(/^\//, "")}
-                />
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    </>
-  );
-}
