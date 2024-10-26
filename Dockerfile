@@ -13,7 +13,7 @@ RUN npm run build
 
 FROM alpine
 LABEL org.opencontainers.image.title="Log Lens" \
-    org.opencontainers.image.description="Filter and view container logs. (Alpha release)" \
+    org.opencontainers.image.description="Filter and view container logs." \
     org.opencontainers.image.vendor="edwinat" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.desktop.extension.icon="https://raw.githubusercontent.com/edwin-abraham-thomas/LogLens/main/loglens.svg" \
