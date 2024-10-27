@@ -1,16 +1,8 @@
-import {
-  Drawer,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Drawer } from "@mui/material";
 import { LogDetails } from "./LogDetails";
 import { useState } from "react";
 import { Log } from "../../interfaces/log";
+import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
 
 interface DrawerState {
   open: boolean;
@@ -25,53 +17,76 @@ export function LogsTable({ logs }: prop) {
   const [drawerState, setDrawerOpen] = useState<DrawerState>({
     open: false,
   });
-  const toggleDrawer = (state: DrawerState) => () => {
-    setDrawerOpen(state);
-  };
+
+  const gridRef = useGridApiRef();
+  const columns: GridColDef[] = [
+    {
+      field: "timestamp",
+      headerName: "Timestamp",
+      width: 215,
+      filterable: false,
+      sortable: false,
+      valueGetter: (_, row) =>
+        row.timestamp.toLocaleString(undefined, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          fractionalSecondDigits: 3,
+        }),
+    },
+    {
+      field: "containerName",
+      headerName: "Container",
+      description: "Container from which log was emitted",
+      flex: 0.3,
+      sortable: false,
+    },
+    {
+      field: "log",
+      headerName: "Message",
+      description: "Log content",
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      resizable: false,
+    },
+  ];
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table stickyHeader size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ minWidth: "18rem" }} variant="head">Timestamp</TableCell>
-              <TableCell sx={{ minWidth: "25rem" }} align="left" variant="head">
-                Container
-              </TableCell>
-              <TableCell align="left" variant="head">Message</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {logs.map((log, index) => (
-              <TableRow
-                hover
-                key={index}
-                onClick={toggleDrawer({ open: true, log: log })}
-              >
-                <TableCell component="th" scope="row" variant="body">
-                  {log.timestamp.toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    fractionalSecondDigits: 3,
-                  })}
-                </TableCell>
-                <TableCell align="left" variant="body">{log.containerName}</TableCell>
-                <TableCell align="left" variant="body" className="pre">{log.log}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <div className="wh">
+        <DataGrid
+          apiRef={gridRef}
+          density="compact"
+          autosizeOnMount
+          rowHeight={46}
+          onCellClick={(params) => {
+            setDrawerOpen({ open: true, log: params.row });
+          }}
+          getRowId={(log) => log.logId}
+          rows={logs}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 50, page: 0 },
+            },
+          }}
+          pageSizeOptions={[
+            20,
+            50,
+            100,
+            { value: -1, label: "All" },
+          ]}
+        />
+      </div>
 
       {drawerState.log && (
         <Drawer
           open={drawerState.open}
-          onClose={toggleDrawer({ open: false })}
+          onClose={() => setDrawerOpen({ open: true })}
           anchor="right"
         >
           <LogDetails log={drawerState.log}></LogDetails>

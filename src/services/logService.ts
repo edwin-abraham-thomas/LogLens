@@ -5,7 +5,7 @@ import { DdClientProvider } from "./ddClientProvider";
 import { LogParser } from "./logParser";
 
 export class LogService {
-  public static getLogs(
+  public static async getLogs(
     filter: FilterCriteria,
     setLogs: (current: Log[]) => void
   ) {
@@ -36,7 +36,7 @@ export class LogService {
       return;
     }
 
-    Promise.allSettled(execPromises)
+    await Promise.allSettled(execPromises)
       .then((results: PromiseSettledResult<Log[]>[]) => {
         let allLogs: Log[] = [];
         for (const result of results) {
