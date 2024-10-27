@@ -32,9 +32,14 @@
   white-space: pre;
 }
 
-@keyframes spin { 
-  100% { 
-      -webkit-transform: rotate(360deg); 
-      transform:rotate(360deg); 
-  } 
+.logs-table-dimension {
+  min-height: 95%;
+  min-width: 100px;
+}
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }

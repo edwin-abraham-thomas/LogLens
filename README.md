@@ -1,11 +1,34 @@
 # LogLens
 Dive into logs and gain insights into what is going on inside your containers.
 
-# Features
+## Features
 - View and inspect logs from containers
+- Filter logs by container
+- View structured logs in formatted view
 
-# Installation
-Install extension by pulling the image from [docker hub](https://hub.docker.com/r/edwinat/loglens/tags) with tag. 
+## Installation
+Go to Docker Desktop -> Extensions tab -> Manage. Search for `Log Lens` and install.
 
-Run this command
-```docker extension install edwinat/loglens:{{tag}}```
+## Changelog
+
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+### [Unreleased] - 2024-10-27
+
+- Update logs table to use DataGrid to improve usability
+    - Columns can be resized and can be hidden
+    - Logs can be paginated
+- Improve performance when loading large numbers of logs
+
+### [1.0.0] - 2024-10-27
+
+- Stable release
+    - Log viewing
+    - Filter
+    - Search
+
+
+[unreleased]: https://github.com/edwin-abraham-thomas/LogLens/tree/main
+[1.0.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v1.0.0

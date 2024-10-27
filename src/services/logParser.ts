@@ -15,16 +15,19 @@ export class LogParser {
     return execResult.stdout
       .split("\n")
       .filter((e) => e)
-      .map((e) => {
+      .map((e, index) => {
         const splitIndex = e.indexOf(" ");
-        const time = e.slice(0, splitIndex);
-        const log = e.slice(splitIndex + 1);
+        const timestamp = e.slice(0, splitIndex);
+        const logString = e.slice(splitIndex + 1);
+        const containerName = container.Names[0].replace(/^\//, "");
+        const logId = `${containerName}-${index}`;
         return {
-          timestamp: new Date(time),
+          timestamp: new Date(timestamp),
           containerId: container.Id,
-          containerName: container.Names[0].replace(/^\//, ""),
-          log: log,
+          containerName: containerName,
+          log: logString,
           stream: "stdout",
+          logId: logId,
         };
       });
   }
@@ -40,16 +43,20 @@ export class LogParser {
     return execResult.stderr
       .split("\n")
       .filter((e) => e)
-      .map((e) => {
+      .map((e, index) => {
         const splitIndex = e.indexOf(" ");
-        const time = e.slice(0, splitIndex);
-        const log = e.slice(splitIndex + 1);
+        const timestamp = e.slice(0, splitIndex);
+        const logString = e.slice(splitIndex + 1);
+        const containerName = container.Names[0].replace(/^\//, "");
+        // const logId = `${containerName}-${index}`;
+        const logId = crypto.randomUUID();
         return {
-          timestamp: new Date(time),
+          timestamp: new Date(timestamp),
           containerId: container.Id,
-          containerName: container.Names[0].replace(/^\//, ""),
-          log: log,
+          containerName: containerName,
+          log: logString,
           stream: "stdrr",
+          logId: logId
         };
       });
   }

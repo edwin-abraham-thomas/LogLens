@@ -89,7 +89,7 @@ export function App() {
       <FilterCriteriaContext.Provider
         value={{ filterCriteria, setFilterCriteria, refreshEvent }}
       >
-        <Box sx={{ height: "95vh", display: "flex", flexDirection: "column" }}>
+        <Box sx={{ height: "97vh", display: "flex", flexDirection: "column" }}>
           <div className="flex items-center gap-1">
             <Typography variant="h2">Log Lens</Typography>
             <div className="spacer"></div>
@@ -111,7 +111,6 @@ export function App() {
               <FilterList />
             </IconButton>
           </div>
-          <Divider />
           <LogsContainer searchText={searchText} />
         </Box>
 
