@@ -57,7 +57,7 @@ export function LogsTable({ logs }: prop) {
 
   return (
     <>
-      <div className="wh">
+      <div className="logs-table-dimension">
         <DataGrid
           apiRef={gridRef}
           density="compact"
