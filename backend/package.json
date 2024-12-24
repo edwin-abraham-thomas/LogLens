@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend servce for loglens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edwin-abraham-thomas/LogLens.git"
+  },
+  "author": "Edwin Abraham Thomas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edwin-abraham-thomas/LogLens/issues"
+  },
+  "homepage": "https://github.com/edwin-abraham-thomas/LogLens#readme",
+  "dependencies": {
+    "mongodb": "6.12"
+  }
+}
