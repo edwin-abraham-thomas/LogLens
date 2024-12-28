@@ -38,7 +38,6 @@ LABEL org.opencontainers.image.title="Log Lens" \
     com.docker.extension.categories="utility-tools"
 COPY metadata.json .
 COPY loglens.svg .
-COPY mongo/init.js mongo/
 COPY docker-compose.yaml .
 
 

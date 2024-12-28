@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/edwin-abraham-thomas/LogLens#readme",
   "dependencies": {
+    "dockerode": "^4.0.2",
     "mongodb": "6.12"
   }
 }

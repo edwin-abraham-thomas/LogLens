@@ -1,23 +1,9 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { initializeDatabase } = require("./data-access/database.js");
+const logIngestJob = require("./jobs/log-ingest-job.js");
 
-const connectionString = 'mongodb://loglensdb:27001';
+async function startApp() {
+  const db = await initializeDatabase();
+  logIngestJob.start(db);
+}
 
-const client = new MongoClient(connectionString, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: false,
-        deprecationErrors: true,
-    }
-});
-
-client.connect()
-    .then(async () => {
-        console.log('Connected to MongoDB');
-        const db = client.db('mydb');
-        const collection = db.collection('mycollection');
-        const document = await collection.findOne();
-        console.log('Sample Document:', document);
-    })
-    .catch(err => {
-        console.error('Error connecting to MongoDB:', err);
-    });
+startApp();

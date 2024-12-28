@@ -2,6 +2,8 @@ services:
   loglensbackend:
     container_name: loglensbackend
     image: ${DESKTOP_PLUGIN_IMAGE}
+    volumes:
+      - /var/run/docker.sock.raw:/var/run/docker.sock
     depends_on:
       - loglensdb
   
@@ -9,9 +11,5 @@ services:
     container_name: loglensdb
     image: mongo:6-jammy
     command: mongod --port 27001
-    # environment:
-    #   - MONGO_INITDB_ROOT_USERNAME=user
-    #   - MONGO_INITDB_ROOT_PASSWORD=pass
-    #   - MONGO_INITDB_DATABASE=mydb
     ports:
       - '27001:27001'
