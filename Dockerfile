@@ -23,6 +23,7 @@ RUN --mount=type=cache,target=/usr/src/backend/.npm \
     npm ci
 # Copy files
 COPY backend /backend
+RUN npm run build
 
 FROM --platform=$BUILDPLATFORM node:21.6.0-alpine3.18
 LABEL org.opencontainers.image.title="Log Lens" \
@@ -45,5 +46,6 @@ COPY docker-compose.yaml .
 COPY --from=ui-builder /ui/build ui
 
 # Configure backend
-COPY --from=backend-builder /backend /backend
+COPY --from=backend-builder /backend/dist /backend
+COPY --from=backend-builder /backend/node_modules /backend/node_modules
 CMD ["node", "/backend/index.js"]

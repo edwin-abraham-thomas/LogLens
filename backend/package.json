@@ -4,6 +4,7 @@
   "description": "Backend servce for loglens",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,13 @@
   "dependencies": {
     "dockerode": "^4.0.2",
     "mongodb": "6.12"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.32",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.2"
   }
 }
