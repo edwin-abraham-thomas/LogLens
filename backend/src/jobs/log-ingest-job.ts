@@ -1,19 +1,19 @@
-var Docker = require("dockerode");
-const { dockerSocketFile } = require("../constants");
-const { processLogs } = require("./process-log-chunks");
-const { logsCollectionName } = require("../constants");
+import Dockerode, { Container } from "dockerode";
+import { dockerSocketFile, logsCollectionName } from "../constants";
+import { processLogChunks } from "./process-log-chunks";
+import { Db } from "mongodb";
 
-async function start(db) {
+export async function startLogIngestJob(db: Db) {
   console.log("Starting log ingest job");
-  var docker = new Docker({ socketPath: dockerSocketFile });
+  var docker = new Dockerode({ socketPath: dockerSocketFile });
 
   const containers = await docker.listContainers();
   containers
     .filter(
-      (containerInfo) =>
+      (containerInfo: any) =>
         !["/loglensbackend", "/loglensdb"].includes(containerInfo.Names[0])
     )
-    .forEach((containerInfo) => {
+    .forEach((containerInfo: any) => {
       docker.getContainer(containerInfo.Id).logs(
         {
           follow: true,
@@ -22,28 +22,23 @@ async function start(db) {
           stdout: true,
           stderr: true,
         },
-        (err, stream) => {
+        (err: any, stream: any) => {
           if (err) {
             console.error("Error getting logs for container", containerInfo.Id);
             return;
           }
 
-          stream.on("data", async (chunk) => {
-            let logs = processLogs(chunk);
+          stream.on("data", async (chunk: Buffer) => {
+            const logs = processLogChunks(chunk);
 
-            logs.forEach((l) =>
+            logs.forEach((l) => {
+              const t = l.timestamp;
+              const timestampString: string = t.toISOString();
+
               console.log(
-                `${l.timestamp.toLocaleString(undefined, {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  fractionalSecondDigits: 3,
-                })} ----- ${l.streamType} ---- ${l.log}`
-              )
-            );
+                `${timestampString} ---- ${l.orderingKey} ---- ${l.streamType} ---- ${l.log}`
+              );
+            });
             await db.collection(logsCollectionName).insertMany(logs);
           });
         }
@@ -51,7 +46,7 @@ async function start(db) {
     });
 
   docker.getEvents().then((stream) => {
-    stream.on("data", (chunk) => {
+    stream.on("data", (chunk: Buffer) => {
       const event = JSON.parse(chunk.toString());
 
       if (event.Type !== "container") {
@@ -62,11 +57,10 @@ async function start(db) {
         console.log(
           `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}`
         );
+
+        const startedContainer = docker.getContainer(event.id);
+        console.log("new container: ", JSON.stringify(startedContainer));
       }
     });
   });
 }
-
-module.exports = {
-  start,
-};

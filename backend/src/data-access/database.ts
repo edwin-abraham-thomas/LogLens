@@ -1,11 +1,7 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const {
-  mongoConnectionString,
-  mongodbname,
-  logsCollectionName,
-} = require("../constants");
+import { MongoClient, ServerApiVersion } from "mongodb";
+import { mongoConnectionString, mongodbname, logsCollectionName } from "../constants";
 
-async function initializeDatabase() {
+export async function initializeDatabase() {
   const client = new MongoClient(mongoConnectionString, {
     serverApi: {
       version: ServerApiVersion.v1,
@@ -32,7 +28,3 @@ async function initializeDatabase() {
     console.log("Error creating collection");
   }
 }
-
-module.exports = {
-  initializeDatabase,
-};

@@ -1,11 +1,13 @@
-function processLogs(chunk) {
+import { LogDetails } from "../models/log-details";
+
+export function processLogChunks(chunk : Buffer): LogDetails[] {
   //   const LOG_HEADER_SIZE = 8;
   //   const logLine = chunk.toString("utf-8", LOG_HEADER_SIZE).trim();
   return chunk
     .toString("utf-8")
     .split("\n")
     .filter((e) => e)
-    .map((l) => {
+    .map((l, i) => {
       const buf = Buffer.from(l);
       const streamTypeByte = buf.readUInt8(0); // Byte 1
 
@@ -30,11 +32,8 @@ function processLogs(chunk) {
       return {
         timestamp: time,
         streamType: streamType,
-        log: log
-      };
+        log: log,
+        orderingKey: time.getTime() + (i/10)
+      } as LogDetails;
     });
 }
-
-module.exports = {
-  processLogs,
-};

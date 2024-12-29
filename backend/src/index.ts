@@ -1,9 +1,15 @@
-const { initializeDatabase } = require("./data-access/database.js");
-const logIngestJob = require("./jobs/log-ingest-job.js");
+import { Db } from "mongodb";
+import { initializeDatabase } from "./data-access/database.js";
+import { startLogIngestJob } from "./jobs/log-ingest-job.js";
 
 async function startApp() {
-  const db = await initializeDatabase();
-  logIngestJob.start(db);
+  const db: Db | undefined = await initializeDatabase();
+
+  if(!db) {
+    console.log("failed to initialize Db");
+    return;
+  }
+  startLogIngestJob(db);
 }
 
 startApp();

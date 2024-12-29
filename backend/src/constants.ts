@@ -1,15 +1,6 @@
-const mongoConnectionString = "mongodb://loglensdb:27001";
-const mongodbname = "loglensdb";
+export const mongoConnectionString = "mongodb://loglensdb:27001";
+export const mongodbname = "loglensdb";
+export const logsCollectionName = "log";
 
-const logsCollectionName = "logs";
-
-const backendApiSocketFile = "/run/guest-services/socket-backend.sock";
-const dockerSocketFile = "/var/run/docker.sock";
-
-module.exports = {
-  mongoConnectionString,
-  mongodbname,
-  logsCollectionName,
-  backendApiSocketFile,
-  dockerSocketFile
-};
+export const backendApiSocketFile = "/run/guest-services/socket-backend.sock";
+export const dockerSocketFile = "/var/run/docker.sock";
