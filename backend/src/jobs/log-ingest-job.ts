@@ -1,66 +1,97 @@
-import Dockerode, { Container } from "dockerode";
-import { dockerSocketFile, logsCollectionName } from "../constants";
+import Dockerode, { ContainerInfo } from "dockerode";
+import { logsCollectionName } from "../constants";
 import { processLogChunks } from "./process-log-chunks";
 import { Db } from "mongodb";
 
-export async function startLogIngestJob(db: Db) {
-  console.log("Starting log ingest job");
-  var docker = new Dockerode({ socketPath: dockerSocketFile });
+export class LogInjestJob {
+  private readonly _db: Db;
+  private readonly _dockerClient: Dockerode;
 
-  const containers = await docker.listContainers();
-  containers
-    .filter(
-      (containerInfo: any) =>
-        !["/loglensbackend", "/loglensdb"].includes(containerInfo.Names[0])
-    )
-    .forEach((containerInfo: any) => {
-      docker.getContainer(containerInfo.Id).logs(
-        {
-          follow: true,
-          details: false,
-          timestamps: true,
-          stdout: true,
-          stderr: true,
-        },
-        (err: any, stream: any) => {
-          if (err) {
-            console.error("Error getting logs for container", containerInfo.Id);
-            return;
-          }
+  constructor(db: Db, dockerClient: Dockerode) {
+    this._db = db;
+    this._dockerClient = dockerClient;
+  }
 
-          stream.on("data", async (chunk: Buffer) => {
-            const logs = processLogChunks(chunk);
+  public async start(): Promise<void> {
+    console.log("Starting log ingest job");
 
-            logs.forEach((l) => {
-              const t = l.timestamp;
-              const timestampString: string = t.toISOString();
+    const containers = await this._dockerClient.listContainers();
+    containers
+      .filter(
+        (containerInfo: ContainerInfo) =>
+          !["/loglensbackend", "/loglensdb"].includes(containerInfo.Names[0])
+      )
+      .forEach(async (containerInfo: ContainerInfo) => {
+        await this.saveContainerLogs(containerInfo.Id, containerInfo);
+      });
 
-              console.log(
-                `${timestampString} ---- ${l.orderingKey} ---- ${l.streamType} ---- ${l.log}`
-              );
-            });
-            await db.collection(logsCollectionName).insertMany(logs);
-          });
+    this._dockerClient.getEvents().then((stream) => {
+      stream.on("data", async (chunk: Buffer) => {
+        const event = JSON.parse(chunk.toString());
+
+        if (event.Type !== "container") {
+          return;
         }
-      );
+
+        const containerStartEvents: string[] = ["start"];
+        if (
+          event.Type === "container" &&
+          containerStartEvents.includes(event.Action)
+        ) {
+          console.log(
+            `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}`
+          );
+          const container = await this._dockerClient.listContainers({filters: {
+            id : event.id
+          }})
+          await this.saveContainerLogs(event.id, container[0]);
+        }
+
+        const containerStopEvents: string[] = ["kill"];
+        if (
+          event.Type === "container" &&
+          containerStopEvents.includes(event.Action)
+        ) {
+          console.log(
+            `Container: ${event.Actor.Attributes.name} stop event. ID: ${event.id}. Action: ${event.Action}`
+          );
+
+          await this.deleteContainerLogs(event.id);
+        }
+      });
     });
+  }
 
-  docker.getEvents().then((stream) => {
-    stream.on("data", (chunk: Buffer) => {
-      const event = JSON.parse(chunk.toString());
+  private async saveContainerLogs(containerId: string, containerInfo: ContainerInfo) {
+    this._dockerClient.getContainer(containerId).logs(
+      {
+        follow: true,
+        details: false,
+        timestamps: true,
+        stdout: true,
+        stderr: true,
+      },
+      (err: any, stream: any) => {
+        if (err) {
+          console.error("Error getting logs for container", containerId);
+          return;
+        }
 
-      if (event.Type !== "container") {
-        return;
+        stream.on("data", async (chunk: Buffer) => {
+          const logs = processLogChunks(chunk);
+          logs.forEach((log) => {
+            log.containerId = containerId;
+            log.containerName = containerInfo.Names[0].replace(/^\//, "")
+          });
+
+          await this._db.collection(logsCollectionName).insertMany(logs);
+        });
       }
+    );
+  }
 
-      if (event.Type === "container" && event.Action === "start") {
-        console.log(
-          `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}`
-        );
-
-        const startedContainer = docker.getContainer(event.id);
-        console.log("new container: ", JSON.stringify(startedContainer));
-      }
-    });
-  });
+  private async deleteContainerLogs(containerId: string): Promise<void> {
+    const filter = { containerId: containerId };
+    await this._db.collection(logsCollectionName).deleteMany(filter);
+  }
 }

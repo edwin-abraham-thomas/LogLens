@@ -1,15 +1,20 @@
 import { Db } from "mongodb";
 import { initializeDatabase } from "./data-access/database.js";
-import { startLogIngestJob } from "./jobs/log-ingest-job.js";
+import { LogInjestJob } from "./jobs/log-ingest-job.js";
+import Dockerode from "dockerode";
+import { dockerSocketFile } from "./constants.js";
 
 async function startApp() {
   const db: Db | undefined = await initializeDatabase();
 
   if(!db) {
-    console.log("failed to initialize Db");
+    console.log("Failed to initialize Db");
     return;
-  }
-  startLogIngestJob(db);
+  }  
+  var dockerClient = new Dockerode({ socketPath: dockerSocketFile });
+
+  // Start jobs
+  new LogInjestJob(db, dockerClient).start()
 }
 
 startApp();
