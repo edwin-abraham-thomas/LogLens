@@ -1,6 +1,5 @@
 import { LogInjestJob } from "./jobs/log-ingest-job.js";
-import Dockerode from "dockerode";
-import { backendApiSocketFile, dockerSocketFile } from "./constants.js";
+import { backendApiSocketFile } from "./constants.js";
 import express, { Request, Response } from 'express';
 import { LogsRepository } from "./data-access/database.js";
 
