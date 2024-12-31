@@ -1,20 +1,28 @@
-import { Db } from "mongodb";
-import { initializeDatabase } from "./data-access/database.js";
 import { LogInjestJob } from "./jobs/log-ingest-job.js";
 import Dockerode from "dockerode";
-import { dockerSocketFile } from "./constants.js";
+import { backendApiSocketFile, dockerSocketFile } from "./constants.js";
+import express, { Request, Response } from 'express';
+import { LogsRepository } from "./data-access/database.js";
 
-async function startApp() {
-  const db: Db | undefined = await initializeDatabase();
-
-  if(!db) {
-    console.log("Failed to initialize Db");
-    return;
-  }  
-  var dockerClient = new Dockerode({ socketPath: dockerSocketFile });
+async function start() {
+  
+  // Database init
+  await new LogsRepository().init();
 
   // Start jobs
-  new LogInjestJob(db, dockerClient).start()
+  new LogInjestJob().start();
+  
+  //APIs
+  const app = express();
+  const apiSocketFile = backendApiSocketFile;
+
+  app.get('/', (req: Request, res: Response) => {
+    res.send('Hello, TypeScript Express!');
+  });
+
+  app.listen(apiSocketFile, () => {
+    console.log(`Server running at apiSocketFile`);
+  });
 }
 
-startApp();
+start();

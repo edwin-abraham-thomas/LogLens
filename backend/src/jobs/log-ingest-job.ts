@@ -1,15 +1,15 @@
 import Dockerode, { ContainerInfo } from "dockerode";
-import { logsCollectionName } from "../constants";
 import { processLogChunks } from "./process-log-chunks";
-import { Db } from "mongodb";
+import { LogsRepository } from "../data-access/database";
+import { Docker } from "../dependencies/docker";
 
 export class LogInjestJob {
-  private readonly _db: Db;
   private readonly _dockerClient: Dockerode;
+  private readonly _logsRepo: LogsRepository;
 
-  constructor(db: Db, dockerClient: Dockerode) {
-    this._db = db;
-    this._dockerClient = dockerClient;
+  constructor() {
+    this._dockerClient = Docker.getDockerClient();
+    this._logsRepo = new LogsRepository();
   }
 
   public async start(): Promise<void> {
@@ -41,9 +41,12 @@ export class LogInjestJob {
           console.log(
             `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}`
           );
-          const container = await this._dockerClient.listContainers({filters: {
-            id : event.id
-          }})
+          const filter = {
+            filters: {
+              id: [event.id],
+            },
+          };
+          const container = await this._dockerClient.listContainers(filter);
           await this.saveContainerLogs(event.id, container[0]);
         }
 
@@ -62,7 +65,10 @@ export class LogInjestJob {
     });
   }
 
-  private async saveContainerLogs(containerId: string, containerInfo: ContainerInfo) {
+  private async saveContainerLogs(
+    containerId: string,
+    containerInfo: ContainerInfo
+  ) {
     this._dockerClient.getContainer(containerId).logs(
       {
         follow: true,
@@ -81,17 +87,16 @@ export class LogInjestJob {
           const logs = processLogChunks(chunk);
           logs.forEach((log) => {
             log.containerId = containerId;
-            log.containerName = containerInfo.Names[0].replace(/^\//, "")
+            log.containerName = containerInfo.Names[0].replace(/^\//, "");
           });
 
-          await this._db.collection(logsCollectionName).insertMany(logs);
+          await this._logsRepo.insertLogs(logs);
         });
       }
     );
   }
 
   private async deleteContainerLogs(containerId: string): Promise<void> {
-    const filter = { containerId: containerId };
-    await this._db.collection(logsCollectionName).deleteMany(filter);
+    await this._logsRepo.deleteLogs(containerId);
   }
 }

@@ -1,30 +1,71 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
-import { mongoConnectionString, mongodbname, logsCollectionName } from "../constants";
+import { Collection, Db, MongoClient, ServerApiVersion } from "mongodb";
+import {
+  mongoConnectionString,
+  mongodbname,
+  logsCollectionName,
+} from "../constants";
+import { LogDetails } from "../models/log-details";
 
-export async function initializeDatabase() {
-  const client = new MongoClient(mongoConnectionString, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: false,
-      deprecationErrors: true,
-    },
-  });
+export abstract class Database {
+  private static _db: Db;
 
-  const db = client.db(mongodbname);
-  const collections = await db.listCollections({ name: logsCollectionName }).toArray();
-  let collection;
-  if (collections.length === 0) {
-    collection = await db.createCollection(logsCollectionName);
-  } else {
-    collection = db.collection(logsCollectionName);
+  protected getDb(): Db {
+    if (!Database._db) {
+      const client = new MongoClient(mongoConnectionString, {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: false,
+          deprecationErrors: true,
+        },
+      });
+      Database._db = client.db(mongodbname);
+    }
+
+    return Database._db;
   }
 
-  if (collection) {
-    console.log(
-      "Database, collection created successfully"
-    );
-    return db;
-  } else {
-    console.log("Error creating collection");
+  protected async initializeCollection(collectionName: string): Promise<void> {
+    console.log(`initializing ${collectionName} collection`);
+    const db = this.getDb();
+    const collections = await db
+      .listCollections({ name: collectionName })
+      .toArray();
+    let collection;
+    if (collections.length === 0) {
+      collection = await db.createCollection(collectionName);
+    } else {
+      collection = db.collection(collectionName);
+    }
+
+    if (collection) {
+      console.log("Database, collection created successfully");
+    } else {
+      console.log("Error creating collection");
+    }
+  }
+}
+
+export class LogsRepository extends Database {
+  constructor() {
+    super();
+  }
+  public async init() {
+    this.initializeCollection(logsCollectionName);
+  }
+
+  public async insertLogs(logs: LogDetails[]): Promise<void> {
+    const collection = this.getLogsCollection();
+    await collection.insertMany(logs);
+  }
+
+  public async deleteLogs(containerId: string) {
+    const collection = this.getLogsCollection();
+    const filter = { containerId: containerId };
+    await collection.deleteMany(filter);
+  }
+
+  private getLogsCollection(): Collection<LogDetails> {
+    const db = this.getDb();
+    return db.collection<LogDetails>(logsCollectionName);
   }
 }

@@ -2,6 +2,8 @@ services:
   loglensbackend:
     container_name: loglensbackend
     image: ${DESKTOP_PLUGIN_IMAGE}
+    ports:
+      - '50001:50001'
     volumes:
       - /var/run/docker.sock.raw:/var/run/docker.sock
     depends_on:
