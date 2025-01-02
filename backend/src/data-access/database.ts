@@ -5,6 +5,7 @@ import {
   logsCollectionName,
 } from "../constants";
 import { LogDetails } from "../models/log-details";
+import { GetLogsRequest } from "../models/get-logs-request";
 
 export abstract class Database {
   private static _db: Db;
@@ -51,6 +52,25 @@ export class LogsRepository extends Database {
   }
   public async init() {
     this.initializeCollection(logsCollectionName);
+  }
+
+  public async getLogs(
+    req: GetLogsRequest,
+    skip: number,
+    limit: number
+  ): Promise<LogDetails[]> {
+    const collection = this.getLogsCollection();
+    const query = {
+      containerId: { $in: req.containerIds },
+      stream: { $in: req.streams },
+    };
+    const logs = await collection
+      .find(query)
+      .sort({ orderingKey: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+    return logs;
   }
 
   public async insertLogs(logs: LogDetails[]): Promise<void> {

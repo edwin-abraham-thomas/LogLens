@@ -15,15 +15,13 @@ export class LogInjestJob {
   public async start(): Promise<void> {
     console.log("Starting log ingest job");
 
-    const containers = await this._dockerClient.listContainers();
-    containers
-      .filter(
-        (containerInfo: ContainerInfo) =>
-          !["/loglensbackend", "/loglensdb"].includes(containerInfo.Names[0])
-      )
-      .forEach(async (containerInfo: ContainerInfo) => {
-        await this.saveContainerLogs(containerInfo.Id, containerInfo);
-      });
+    const containers = await this._dockerClient.listContainers({ all: true });
+    containers.forEach(async (containerInfo: ContainerInfo) => {
+      console.log(
+        `Found container ${containerInfo.Names[0]}. Looking for logs`
+      );
+      await this.saveContainerLogs(containerInfo.Id, containerInfo);
+    });
 
     this._dockerClient.getEvents().then((stream) => {
       stream.on("data", async (chunk: Buffer) => {
@@ -32,14 +30,13 @@ export class LogInjestJob {
         if (event.Type !== "container") {
           return;
         }
-
         const containerStartEvents: string[] = ["start"];
         if (
           event.Type === "container" &&
           containerStartEvents.includes(event.Action)
         ) {
           console.log(
-            `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}`
+            `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}. Saving logs`
           );
           const filter = {
             filters: {
@@ -50,13 +47,13 @@ export class LogInjestJob {
           await this.saveContainerLogs(event.id, container[0]);
         }
 
-        const containerStopEvents: string[] = ["kill"];
+        const containerStopEvents: string[] = ["destroy"];
         if (
           event.Type === "container" &&
           containerStopEvents.includes(event.Action)
         ) {
           console.log(
-            `Container: ${event.Actor.Attributes.name} stop event. ID: ${event.id}. Action: ${event.Action}`
+            `Container: ${event.Actor.Attributes.name} stop event. ID: ${event.id}. Action: ${event.Action}. Deleting logs`
           );
 
           await this.deleteContainerLogs(event.id);
@@ -85,11 +82,11 @@ export class LogInjestJob {
 
         stream.on("data", async (chunk: Buffer) => {
           const logs = processLogChunks(chunk);
+          const containerName = containerInfo.Names[0].replace(/^\//, "");
           logs.forEach((log) => {
             log.containerId = containerId;
-            log.containerName = containerInfo.Names[0].replace(/^\//, "");
+            log.containerName = containerName;
           });
-
           await this._logsRepo.insertLogs(logs);
         });
       }

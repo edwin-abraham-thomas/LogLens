@@ -1,8 +1,16 @@
 import { Drawer } from "@mui/material";
 import { LogDetails } from "./LogDetails";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Log } from "../../interfaces/log";
-import { DataGrid, GridColDef, useGridApiRef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  useGridApiRef,
+} from "@mui/x-data-grid";
+import { FilterCriteriaContext } from "../../App";
+import { FilterCriteria } from "../../interfaces/filterCriteria";
+import { Constants } from "../../constants";
 
 interface DrawerState {
   open: boolean;
@@ -14,6 +22,11 @@ type prop = {
 };
 
 export function LogsTable({ logs }: prop) {
+  //Contexts
+  const { filterCriteria, setFilterCriteria } = useContext(
+    FilterCriteriaContext
+  );
+
   const [drawerState, setDrawerOpen] = useState<DrawerState>({
     open: false,
   });
@@ -59,6 +72,16 @@ export function LogsTable({ logs }: prop) {
     <>
       <div className="logs-table-dimension">
         <DataGrid
+          paginationMode="server"
+          onPaginationModelChange={(change: GridPaginationModel) => {
+            console.log("Pagination changed", change);
+            const fcUpdate: FilterCriteria = {
+              ...filterCriteria,
+              page: change.page,
+              pageSize: change.pageSize,
+            };
+            setFilterCriteria(fcUpdate);
+          }}
           apiRef={gridRef}
           density="compact"
           autosizeOnMount
@@ -66,20 +89,16 @@ export function LogsTable({ logs }: prop) {
           onCellClick={(params) => {
             setDrawerOpen({ open: true, log: params.row });
           }}
-          getRowId={(log) => log.logId}
+          getRowId={(log) => log._id}
           rows={logs}
           columns={columns}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: 50, page: 0 },
+              paginationModel: { pageSize: Constants.DEFAULT_PAGE_SIZE, page: Constants.DEFAULT_PAGE},
+              rowCount: -1
             },
           }}
-          pageSizeOptions={[
-            20,
-            50,
-            100,
-            { value: -1, label: "All" },
-          ]}
+          pageSizeOptions={[20, 50, 100, { value: -1, label: "All" }]}
         />
       </div>
 

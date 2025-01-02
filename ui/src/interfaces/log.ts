@@ -1,7 +1,7 @@
 import { Stream } from "../types/stream";
 
 export interface Log{
-    logId: string;
+    _id: string;
     containerId: string;
     containerName: string;
     log: string;

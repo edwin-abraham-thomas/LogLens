@@ -17,8 +17,8 @@ export function LogsContainer({ searchText }: prop) {
 
   useEffect(() => {
     setLoading(true);
-    setTimeout(() => {
-      LogService.getLogs(filterCriteria, setLogs);
+    setTimeout(async () => {
+      await LogService.getLogs(filterCriteria, setLogs);
       setLoading(false);
     });
 
@@ -27,10 +27,6 @@ export function LogsContainer({ searchText }: prop) {
 
   return (
     <>
-      {/* <pre>
-        {filterCriteria.selectedContainers.map((c) => c.Names).join("  ")}
-      </pre> */}
-
       <LogsTable logs={logs.filter((s) => s.log.includes(searchText))} />
 
       <Backdrop

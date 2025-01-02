@@ -1,5 +1,4 @@
 import { Typography } from "@mui/material";
-import { useEffect } from "react";
 import { Log } from "../../interfaces/log";
 import { LogParser } from "../../services/logParser";
 

@@ -1,4 +1,4 @@
-import { LogDetails } from "../models/log-details";
+import { LogDetails, Stream } from "../models/log-details";
 
 export function processLogChunks(chunk : Buffer): LogDetails[] {
   //   const LOG_HEADER_SIZE = 8;
@@ -11,13 +11,13 @@ export function processLogChunks(chunk : Buffer): LogDetails[] {
       const buf = Buffer.from(l);
       const streamTypeByte = buf.readUInt8(0); // Byte 1
 
-      let streamType;
+      let streamType : Stream;
       switch (streamTypeByte) {
         case 0x01:
           streamType = "stdout";
           break;
         case 0x02:
-          streamType = "stderr";
+          streamType = "stdrr";
           break;
         default:
           streamType = "unknown";
@@ -31,7 +31,7 @@ export function processLogChunks(chunk : Buffer): LogDetails[] {
       const log = logPayload.slice(timestampSplitIndex + 1);
       return {
         timestamp: time,
-        streamType: streamType,
+        stream: streamType,
         log: log,
         orderingKey: time.getTime() + (i/10)
       } as LogDetails;

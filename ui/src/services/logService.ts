@@ -1,8 +1,9 @@
-import { ExecResult } from "@docker/extension-api-client-types/dist/v1";
 import { Log } from "../interfaces/log";
 import { FilterCriteria } from "../interfaces/filterCriteria";
 import { DdClientProvider } from "./ddClientProvider";
-import { LogParser } from "./logParser";
+import { GetLogsRequest } from "../interfaces/requests/get-logs-request";
+import { Stream } from "../types/stream";
+import { Constants } from "../constants";
 
 export class LogService {
   public static async getLogs(
@@ -11,54 +12,24 @@ export class LogService {
   ) {
     const ddClient = DdClientProvider.getClient();
 
-    const execPromises = filter?.selectedContainers.map((container) => {
-      return new Promise<Log[]>((resolve, reject) => {
-        ddClient.docker.cli
-          .exec("logs", ["--timestamps", container.Id])
-          .then((execResult: ExecResult) => {
-            const stdoutLogs = LogParser.parseStdoutLogs(
-              execResult,
-              container,
-              filter
-            );
-            const stderrLogs = LogParser.parseStderrLogs(
-              execResult,
-              container,
-              filter
-            );
-            resolve([...stdoutLogs, ...stderrLogs]);
-          })
-          .catch((err) => reject(err));
-      });
-    });
-
-    if (!execPromises) {
-      return;
+    const streams: Stream[] = [];
+    if (filter.stdout) {
+      streams.push("stdout");
+    }
+    if (filter.stderr) {
+      streams.push("stdrr");
     }
 
-    await Promise.allSettled(execPromises)
-      .then((results: PromiseSettledResult<Log[]>[]) => {
-        let allLogs: Log[] = [];
-        for (const result of results) {
-          if (result.status === "fulfilled") {
-            allLogs = allLogs.concat(result.value);
-          } else {
-            console.error(
-              "Error getting logs for a container: ",
-              result.reason
-            );
-          }
-        }
-
-        const sortedLogs = allLogs.sort(
-          (a, b) => a.timestamp?.getTime() - b.timestamp?.getTime()
-        )
-        .reverse();
-
-        setLogs(sortedLogs);
-      })
-      .catch((error) => {
-        console.log("Error occured", error);
-      });
+    const request: GetLogsRequest = {
+      containerIds: filter.selectedContainers.map((c) => c.Id),
+      streams: streams,
+      page: filter.page ?? Constants.DEFAULT_PAGE, //TODO: Remove thes defaults
+      pageSize: filter.pageSize ?? Constants.DEFAULT_PAGE_SIZE, //TODO: Remove thes defaults
+    };
+    const logs = (await ddClient.extension.vm?.service?.post(
+      "/logs",
+      request
+    )) as Log[];
+    setLogs(logs);
   }
 }

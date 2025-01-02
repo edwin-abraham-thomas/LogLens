@@ -3,7 +3,7 @@
   "vm": {
     "composefile": "docker-compose.yaml",
     "exposes": {
-      "socket": "socket-backend.sock"
+      "socket": "llbackend.sock"
     }
   },
   "ui": {

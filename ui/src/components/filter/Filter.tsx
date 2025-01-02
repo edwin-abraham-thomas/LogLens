@@ -110,7 +110,7 @@ function containerList(
             {containers.map((c) => {
               return (
                 <FormControlLabel
-                key={c.Id}
+                  key={c.Id}
                   control={
                     <Checkbox
                       onClick={() => handleContainerSelection(c)}
@@ -212,4 +212,3 @@ function logSourceList(
     </Card>
   );
 }
-

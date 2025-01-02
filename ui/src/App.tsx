@@ -1,12 +1,5 @@
 import "./styles.css";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Modal, TextField, Typography } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filterCriteria";
 import { Filter } from "./components/filter/Filter";
@@ -15,11 +8,13 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import { LogsContainer } from "./components/logs/LogsContainer";
 import { Constants } from "./constants";
 
-// Context setup
+//#region Context setup
 const filterCriteriaInitialState: FilterCriteria = {
   selectedContainers: [],
   stdout: true,
   stderr: true,
+  page: Constants.DEFAULT_PAGE,
+  pageSize: Constants.DEFAULT_PAGE_SIZE,
 };
 type FCContextType = {
   filterCriteria: FilterCriteria;
@@ -31,9 +26,10 @@ export const FilterCriteriaContext = createContext<FCContextType>({
   setFilterCriteria: () => {},
   refreshEvent: false,
 });
+//#endregion
 
 export function App() {
-  //Filter modal settings
+  //#region Filter modal settings
   const filterModalStyle = {
     minWidth: "16rem",
     padding: "1rem",
@@ -46,6 +42,7 @@ export function App() {
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
   const handleFilterModalClose = () => setFilterModalOpen(false);
   const handleFilterModalOpen = () => setFilterModalOpen(true);
+  //#endregion
 
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
     filterCriteriaInitialState
@@ -54,6 +51,7 @@ export function App() {
 
   const [searchText, setSearchText] = useState<string>("");
 
+  //#region Local storage management
   useEffect(() => {
     const presetFilterCriteriaString = localStorage.getItem(
       Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
@@ -83,6 +81,7 @@ export function App() {
       JSON.stringify(filterCriteria)
     );
   }, [filterCriteria]);
+  //#endregion
 
   return (
     <>
@@ -104,10 +103,7 @@ export function App() {
             >
               <RefreshIcon />
             </IconButton>
-            <IconButton
-              aria-label="filter"
-              onClick={handleFilterModalOpen}
-            >
+            <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
               <FilterList />
             </IconButton>
           </div>

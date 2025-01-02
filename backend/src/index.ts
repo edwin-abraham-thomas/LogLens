@@ -1,27 +1,46 @@
 import { LogInjestJob } from "./jobs/log-ingest-job.js";
 import { backendApiSocketFile } from "./constants.js";
-import express, { Request, Response } from 'express';
+import express, { Request, Response } from "express";
 import { LogsRepository } from "./data-access/database.js";
+import fs from "fs";
+import { LogService } from "./services/log-service.js";
+import { GetLogsRequest } from "./models/get-logs-request.js";
 
 async function start() {
-  
-  // Database init
+  //#region Database init
   await new LogsRepository().init();
+  //#endregion
 
-  // Start jobs
+  //#region Jobs
   new LogInjestJob().start();
-  
-  //APIs
+  //#endregion
+
+  //#region APIs
   const app = express();
-  const apiSocketFile = backendApiSocketFile;
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-  app.get('/', (req: Request, res: Response) => {
-    res.send('Hello, TypeScript Express!');
-  });
+  // After a server is done with the unix domain socket, it is not automatically destroyed.
+  // You must instead unlink the socket in order to reuse that address/path.
+  // To do this, we delete the file with fs.unlinkSync()
+  try {
+    fs.unlinkSync(backendApiSocketFile);
+    console.log("Deleted the UNIX socket file.");
+  } catch (err) {
+    console.log("Did not need to delete the UNIX socket file.");
+  }
 
-  app.listen(apiSocketFile, () => {
-    console.log(`Server running at apiSocketFile`);
+  app.post("/logs", async (req: Request<GetLogsRequest>, res: Response) => {
+    console.log("Processing rquest: ", JSON.stringify(req.body));
+    const logService = new LogService();
+    const logs = await logService.getLogs(req.body)
+    res.status(200).send(logs)
+  })
+
+  app.listen(backendApiSocketFile, () => {
+    console.log(`Server running at ${backendApiSocketFile}`);
   });
+  //#endregion
 }
 
 start();
