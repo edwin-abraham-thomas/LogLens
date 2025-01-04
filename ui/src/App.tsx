@@ -1,11 +1,11 @@
 import "./styles.css";
 import { Box, IconButton, Modal, TextField, Typography } from "@mui/material";
 import { createContext, useEffect, useState } from "react";
-import { FilterCriteria } from "./interfaces/filterCriteria";
-import { Filter } from "./components/filter/Filter";
+import { FilterCriteria } from "./interfaces/filter-criteria";
+import { Filter } from "./components/filter/filter";
 import { FilterList } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { LogsContainer } from "./components/logs/LogsContainer";
+import { LogsContainer } from "./components/logs/logs-container";
 import { Constants } from "./constants";
 
 //#region Context setup

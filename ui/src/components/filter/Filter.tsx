@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Container } from "../../interfaces/container";
-import { ContainerService } from "../../services/containerService";
+import { ContainerService } from "../../services/container-service";
 import {
   Card,
   CardContent,
@@ -9,9 +9,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { FilterCriteria } from "../../interfaces/filterCriteria";
-import { FilterCriteriaContext } from "../../App";
-import { ContainerStatusIcon } from "../icons/ContainerStatusIcon";
+import { FilterCriteria } from "../../interfaces/filter-criteria";
+import { FilterCriteriaContext } from "../../app";
+import { ContainerStatusIcon } from "../icons/container-status-icon";
 
 export function Filter() {
   //Contexts

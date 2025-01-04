@@ -1,5 +1,5 @@
 import { Container } from "../interfaces/container";
-import { DdClientProvider } from "./ddClientProvider";
+import { DdClientProvider } from "./dd-client-provider";
 
 export class ContainerService {
   public static async getContainers(): Promise<Container[]> {

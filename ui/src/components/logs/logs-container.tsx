@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { FilterCriteriaContext } from "../../App";
+import { FilterCriteriaContext } from "../../app";
 import { Log } from "../../interfaces/log";
-import { LogService } from "../../services/logService";
-import { LogsTable } from "./LogsTable";
+import { LogService } from "../../services/log-service";
+import { LogsTable } from "./logs-table";
 import { Backdrop, CircularProgress } from "@mui/material";
 
 type prop = {

@@ -1,5 +1,5 @@
 import { Drawer } from "@mui/material";
-import { LogDetails } from "./LogDetails";
+import { LogDetails } from "./log-details";
 import { useContext, useState } from "react";
 import { Log } from "../../interfaces/log";
 import {
@@ -8,8 +8,8 @@ import {
   GridPaginationModel,
   useGridApiRef,
 } from "@mui/x-data-grid";
-import { FilterCriteriaContext } from "../../App";
-import { FilterCriteria } from "../../interfaces/filterCriteria";
+import { FilterCriteriaContext } from "../../app";
+import { FilterCriteria } from "../../interfaces/filter-criteria";
 
 interface DrawerState {
   open: boolean;

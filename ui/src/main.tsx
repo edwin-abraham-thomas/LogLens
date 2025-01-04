@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import CssBaseline from "@mui/material/CssBaseline";
 import { DockerMuiV5ThemeProvider } from "@docker/docker-mui-theme";
 
-import { App } from "./App";
+import { App } from "./app";
 import { GlobalStyles } from "@mui/material";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

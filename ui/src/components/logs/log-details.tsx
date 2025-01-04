@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import { Log } from "../../interfaces/log";
-import { LogParser } from "../../services/logParser";
+import { LogParser } from "../../services/log-parser";
 
 type prop = {
   log: Log;

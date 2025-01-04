@@ -11,11 +11,13 @@ build: ## Build service image to be deployed as a desktop extension
 
 install: build ## Install the extension
 	docker extension install $(IMAGE):$(TAG)
+
+update-lh: build ## Update the extension with attach localhost
+	docker extension update $(IMAGE):$(TAG)
 	make attach-localhost
 
 update: build ## Update the extension
 	docker extension update $(IMAGE):$(TAG)
-	make attach-localhost
 
 validate: push
 	docker extension validate -a -s -i $(IMAGE):$(TAG)

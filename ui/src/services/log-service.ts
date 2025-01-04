@@ -1,9 +1,8 @@
 import { Log } from "../interfaces/log";
-import { FilterCriteria } from "../interfaces/filterCriteria";
-import { DdClientProvider } from "./ddClientProvider";
+import { FilterCriteria } from "../interfaces/filter-criteria";
+import { DdClientProvider } from "./dd-client-provider";
 import { GetLogsRequest } from "../interfaces/requests/get-logs-request";
 import { Stream } from "../types/stream";
-import { Constants } from "../constants";
 import { GetLogsResponse } from "../interfaces/responses/get-logs-response";
 
 export class LogService {
@@ -12,6 +11,7 @@ export class LogService {
     setLogs: (current: Log[]) => void
   ) {
     if (filter.selectedContainers.length === 0) {
+      setLogs([]);
       return;
     }
     const ddClient = DdClientProvider.getClient();
@@ -30,6 +30,7 @@ export class LogService {
       page: filter.page,
       pageSize: filter.pageSize,
     };
+    console.log("getting logs. Request:", request);
     const getLogsResponse = (await ddClient.extension.vm?.service?.post(
       "/logs",
       request

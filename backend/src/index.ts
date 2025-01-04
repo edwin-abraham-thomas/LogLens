@@ -31,7 +31,7 @@ async function start() {
     console.log("Did not need to delete the UNIX socket file.");
   }
 
-  app.post("/logs", async (req: Request<GetLogsRequest>, res: Response<GetLogsResponse>) => {
+  app.post("/logs", async (req: Request<GetLogsRequest>, res: Response) => {
     console.log("Processing rquest: ", JSON.stringify(req.body));
     const logService = new LogService();
     const logs = await logService.getLogs(req.body)
