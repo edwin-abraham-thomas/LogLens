@@ -73,6 +73,7 @@ export class LogsRepository extends Database {
       .toArray();
 
     const count = await collection.countDocuments(query);
+    console.log(`Found ${count} logs`);
     return {
       logs: logs,
       estimatedRowCount: count,

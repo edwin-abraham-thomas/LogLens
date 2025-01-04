@@ -1,4 +1,3 @@
-import { Log } from "../interfaces/log";
 import { FilterCriteria } from "../interfaces/filter-criteria";
 import { DdClientProvider } from "./dd-client-provider";
 import { GetLogsRequest } from "../interfaces/requests/get-logs-request";
@@ -7,12 +6,10 @@ import { GetLogsResponse } from "../interfaces/responses/get-logs-response";
 
 export class LogService {
   public static async getLogs(
-    filter: FilterCriteria,
-    setLogs: (current: Log[]) => void
-  ) {
+    filter: FilterCriteria
+  ): Promise<GetLogsResponse | null> {
     if (filter.selectedContainers.length === 0) {
-      setLogs([]);
-      return;
+      return null;
     }
     const ddClient = DdClientProvider.getClient();
 
@@ -30,11 +27,10 @@ export class LogService {
       page: filter.page,
       pageSize: filter.pageSize,
     };
-    console.log("getting logs. Request:", request);
-    const getLogsResponse = (await ddClient.extension.vm?.service?.post(
+    
+    return (await ddClient.extension.vm?.service?.post(
       "/logs",
       request
     )) as GetLogsResponse;
-    setLogs(getLogsResponse.logs);
   }
 }

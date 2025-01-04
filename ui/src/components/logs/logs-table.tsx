@@ -18,9 +18,10 @@ interface DrawerState {
 
 type prop = {
   logs: Log[];
+  estimatedLogsCount: number
 };
 
-export function LogsTable({ logs }: prop) {
+export function LogsTable({ logs, estimatedLogsCount }: prop) {
   //Contexts
   const { filterCriteria, setFilterCriteria } = useContext(
     FilterCriteriaContext
@@ -82,6 +83,7 @@ export function LogsTable({ logs }: prop) {
         <DataGrid
           paginationMode="server"
           onPaginationModelChange={onPaginationChange}
+          estimatedRowCount={estimatedLogsCount}
           apiRef={gridRef}
           density="compact"
           autosizeOnMount

@@ -13,12 +13,24 @@ export function LogsContainer({ searchText }: prop) {
   //Contexts
   const { filterCriteria, refreshEvent } = useContext(FilterCriteriaContext);
   const [logs, setLogs] = useState<Log[]>([]);
+  const [estimatedLogsCount, setEstimatedLogsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
     setTimeout(async () => {
-      await LogService.getLogs(filterCriteria, setLogs);
+      const response = await LogService.getLogs(filterCriteria);
+      if (response != null) {
+        setLogs(response.logs);
+        console.log(
+          "Setting estimatedRowCount to ",
+          response.estimatedRowCount
+        );
+        setEstimatedLogsCount(response.estimatedRowCount);
+      } else {
+        setLogs([]);
+        setEstimatedLogsCount(0);
+      }
       setLoading(false);
     });
 
@@ -27,7 +39,10 @@ export function LogsContainer({ searchText }: prop) {
 
   return (
     <>
-      <LogsTable logs={logs.filter((s) => s.log.includes(searchText))} />
+      <LogsTable
+        logs={logs.filter((s) => s.log.includes(searchText))}
+        estimatedLogsCount={estimatedLogsCount}
+      />
 
       <Backdrop
         sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
