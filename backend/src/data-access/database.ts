@@ -5,7 +5,8 @@ import {
   logsCollectionName,
 } from "../constants";
 import { LogDetails } from "../models/log-details";
-import { GetLogsRequest } from "../models/get-logs-request";
+import { GetLogsRequest } from "../models/requests/get-logs-request";
+import { GetLogsResponse } from "../models/responses/get-logs-response";
 
 export abstract class Database {
   private static _db: Db;
@@ -58,7 +59,7 @@ export class LogsRepository extends Database {
     req: GetLogsRequest,
     skip: number,
     limit: number
-  ): Promise<LogDetails[]> {
+  ): Promise<GetLogsResponse> {
     const collection = this.getLogsCollection();
     const query = {
       containerId: { $in: req.containerIds },
@@ -70,7 +71,12 @@ export class LogsRepository extends Database {
       .skip(skip)
       .limit(limit)
       .toArray();
-    return logs;
+
+    const count = await collection.countDocuments(query);
+    return {
+      logs: logs,
+      estimatedRowCount: count,
+    };
   }
 
   public async insertLogs(logs: LogDetails[]): Promise<void> {

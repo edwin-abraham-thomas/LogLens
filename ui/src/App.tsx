@@ -9,7 +9,7 @@ import { LogsContainer } from "./components/logs/LogsContainer";
 import { Constants } from "./constants";
 
 //#region Context setup
-const filterCriteriaInitialState: FilterCriteria = {
+const defaultFilterCriteria: FilterCriteria = {
   selectedContainers: [],
   stdout: true,
   stderr: true,
@@ -21,8 +21,9 @@ type FCContextType = {
   setFilterCriteria: (filterCriteria: FilterCriteria) => void;
   refreshEvent: boolean;
 };
+const startupFilterCriteria = getInitialFC();
 export const FilterCriteriaContext = createContext<FCContextType>({
-  filterCriteria: filterCriteriaInitialState,
+  filterCriteria: startupFilterCriteria,
   setFilterCriteria: () => {},
   refreshEvent: false,
 });
@@ -45,7 +46,7 @@ export function App() {
   //#endregion
 
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>(
-    filterCriteriaInitialState
+    startupFilterCriteria
   );
   const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
 
@@ -53,26 +54,10 @@ export function App() {
 
   //#region Local storage management
   useEffect(() => {
-    const presetFilterCriteriaString = localStorage.getItem(
-      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
-    );
-    if (
-      presetFilterCriteriaString !== null &&
-      presetFilterCriteriaString !== "" &&
-      presetFilterCriteriaString !== undefined
-    ) {
-      const presetFilter = JSON.parse(presetFilterCriteriaString);
-      setFilterCriteria(presetFilter);
-    } else {
-      setFilterCriteria(filterCriteriaInitialState);
-    }
-  }, []);
-
-  useEffect(() => {
     if (
       filterCriteria === null ||
       filterCriteria === undefined ||
-      filterCriteria == filterCriteriaInitialState
+      filterCriteria == defaultFilterCriteria
     ) {
       return;
     }
@@ -128,4 +113,20 @@ export function App() {
       </FilterCriteriaContext.Provider>
     </>
   );
+}
+
+function getInitialFC(): FilterCriteria {
+  const presetFilterCriteriaString = localStorage.getItem(
+    Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
+  );
+  if (
+    presetFilterCriteriaString !== null &&
+    presetFilterCriteriaString !== "" &&
+    presetFilterCriteriaString !== undefined
+  ) {
+    const presetFilter = JSON.parse(presetFilterCriteriaString);
+    return presetFilter;
+  } else {
+    return defaultFilterCriteria;
+  }
 }

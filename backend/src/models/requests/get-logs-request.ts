@@ -1,4 +1,4 @@
-import { Stream } from "./log-details";
+import { Stream } from "../log-details";
 
 export interface GetLogsRequest {
   streams: Stream[];

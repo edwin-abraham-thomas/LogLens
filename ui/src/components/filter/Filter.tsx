@@ -76,12 +76,12 @@ function containerList(
   );
 
   const handleContainerSelection = (container: Container) => {
-    var selectedContainers = filterCriteria.selectedContainers;
+    let selectedContainers = filterCriteria.selectedContainers;
     const existIndex = selectedContainers.findIndex(
       (c) => c.Id == container.Id
     );
 
-    var fcUpdate: FilterCriteria;
+    let fcUpdate: FilterCriteria;
     if (existIndex !== -1) {
       selectedContainers = selectedContainers.filter(
         (sc) => sc.Id !== container.Id

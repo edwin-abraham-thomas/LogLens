@@ -10,7 +10,6 @@ import {
 } from "@mui/x-data-grid";
 import { FilterCriteriaContext } from "../../App";
 import { FilterCriteria } from "../../interfaces/filterCriteria";
-import { Constants } from "../../constants";
 
 interface DrawerState {
   open: boolean;
@@ -68,20 +67,21 @@ export function LogsTable({ logs }: prop) {
     },
   ];
 
+  const onPaginationChange = (change: GridPaginationModel) => {
+    const fcUpdate: FilterCriteria = {
+      ...filterCriteria,
+      page: change.page,
+      pageSize: change.pageSize,
+    };
+    setFilterCriteria(fcUpdate);
+  };
+
   return (
     <>
       <div className="logs-table-dimension">
         <DataGrid
           paginationMode="server"
-          onPaginationModelChange={(change: GridPaginationModel) => {
-            console.log("Pagination changed", change);
-            const fcUpdate: FilterCriteria = {
-              ...filterCriteria,
-              page: change.page,
-              pageSize: change.pageSize,
-            };
-            setFilterCriteria(fcUpdate);
-          }}
+          onPaginationModelChange={onPaginationChange}
           apiRef={gridRef}
           density="compact"
           autosizeOnMount
@@ -94,8 +94,11 @@ export function LogsTable({ logs }: prop) {
           columns={columns}
           initialState={{
             pagination: {
-              paginationModel: { pageSize: Constants.DEFAULT_PAGE_SIZE, page: Constants.DEFAULT_PAGE},
-              rowCount: -1
+              paginationModel: {
+                pageSize: filterCriteria.pageSize,
+                page: filterCriteria.page,
+              },
+              rowCount: -1,
             },
           }}
           pageSizeOptions={[20, 50, 100, { value: -1, label: "All" }]}

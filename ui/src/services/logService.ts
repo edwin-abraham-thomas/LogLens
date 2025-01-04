@@ -4,12 +4,16 @@ import { DdClientProvider } from "./ddClientProvider";
 import { GetLogsRequest } from "../interfaces/requests/get-logs-request";
 import { Stream } from "../types/stream";
 import { Constants } from "../constants";
+import { GetLogsResponse } from "../interfaces/responses/get-logs-response";
 
 export class LogService {
   public static async getLogs(
     filter: FilterCriteria,
     setLogs: (current: Log[]) => void
   ) {
+    if (filter.selectedContainers.length === 0) {
+      return;
+    }
     const ddClient = DdClientProvider.getClient();
 
     const streams: Stream[] = [];
@@ -23,13 +27,13 @@ export class LogService {
     const request: GetLogsRequest = {
       containerIds: filter.selectedContainers.map((c) => c.Id),
       streams: streams,
-      page: filter.page ?? Constants.DEFAULT_PAGE, //TODO: Remove thes defaults
-      pageSize: filter.pageSize ?? Constants.DEFAULT_PAGE_SIZE, //TODO: Remove thes defaults
+      page: filter.page,
+      pageSize: filter.pageSize,
     };
-    const logs = (await ddClient.extension.vm?.service?.post(
+    const getLogsResponse = (await ddClient.extension.vm?.service?.post(
       "/logs",
       request
-    )) as Log[];
-    setLogs(logs);
+    )) as GetLogsResponse;
+    setLogs(getLogsResponse.logs);
   }
 }
