@@ -22,7 +22,12 @@ export function Filter() {
   const [containers, setContainers] = useState<Container[]>([]);
   const setContainersList = (syncFC: boolean = false) => {
     ContainerService.getContainers().then((fetchedContainers: Container[]) => {
-      setContainers(fetchedContainers);
+      setContainers(
+        fetchedContainers.filter(
+          (container) =>
+            !["/loglensbackend", "/loglensdb"].includes(container.Names[0])
+        )
+      );
 
       if (syncFC) {
         const nonExistantContainers: Container[] = [];

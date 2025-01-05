@@ -39,6 +39,7 @@ export function App() {
     border: "solid",
     borderColor: "secondary.main",
     maxHeight: "80vh",
+    overflow: "auto"
   };
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
   const handleFilterModalClose = () => setFilterModalOpen(false);
@@ -100,7 +101,7 @@ export function App() {
             position: "fixed",
             zIndex: 9999,
             paddingTop: "4rem",
-            paddingRight: "3rem",
+            paddingRight: "3rem"
           }}
           className="flex flex-top-right"
           open={filterModalOpen}

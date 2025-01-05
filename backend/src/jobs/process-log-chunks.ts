@@ -20,15 +20,22 @@ export function processLogChunks(chunk : Buffer): LogDetails[] {
           streamType = "stdrr";
           break;
         default:
-          streamType = "unknown";
+          streamType = "stdout";
       }
-      // const payloadSize = chunk.readUInt32BE(4); // Bytes 5-8
 
-      const logPayload = l.substring(8); // Remove header
+      const timestampRegex = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)/;
+      const match = l.match(timestampRegex);
+      let time: Date;
+      if(match !== null){
+        time = new Date(match[0])
+      }
+      else{
+        console.error(`Failed to extract timestamp from log: ${l}`);
+        time = new Date();
+      }
 
-      const timestampSplitIndex = logPayload.indexOf(" ");
-      const time = new Date(logPayload.slice(0, timestampSplitIndex));
-      const log = logPayload.slice(timestampSplitIndex + 1);
+      const splitIndex = l.indexOf(" ");
+      const log = l.slice(splitIndex + 1);
       return {
         timestamp: time,
         stream: streamType,

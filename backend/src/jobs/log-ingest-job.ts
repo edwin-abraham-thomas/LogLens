@@ -6,17 +6,24 @@ import { Docker } from "../dependencies/docker";
 export class LogInjestJob {
   private readonly _dockerClient: Dockerode;
   private readonly _logsRepo: LogsRepository;
+  private readonly _containerExclutionList: string[];
 
   constructor() {
     this._dockerClient = Docker.getDockerClient();
     this._logsRepo = new LogsRepository();
+    this._containerExclutionList = ["/loglensbackend", "/loglensdb"]
   }
 
   public async start(): Promise<void> {
     console.log("Starting log ingest job");
 
     const containers = await this._dockerClient.listContainers({ all: true });
-    containers.forEach(async (containerInfo: ContainerInfo) => {
+    containers
+    .filter(
+      (containerInfo: any) =>
+        !this._containerExclutionList.includes(containerInfo.Names[0])
+    )
+    .forEach(async (containerInfo: ContainerInfo) => {
       console.log(
         `Found container ${containerInfo.Names[0]}. Looking for logs`
       );

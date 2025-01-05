@@ -6,10 +6,12 @@ import {
   DataGrid,
   GridColDef,
   GridPaginationModel,
+  GridRenderCellParams,
   useGridApiRef,
 } from "@mui/x-data-grid";
 import { FilterCriteriaContext } from "../../app";
 import { FilterCriteria } from "../../interfaces/filter-criteria";
+import Highlighter from "react-highlight-words";
 
 interface DrawerState {
   open: boolean;
@@ -18,10 +20,11 @@ interface DrawerState {
 
 type prop = {
   logs: Log[];
-  estimatedLogsCount: number
+  estimatedLogsCount: number;
+  searchText: string;
 };
 
-export function LogsTable({ logs, estimatedLogsCount }: prop) {
+export function LogsTable({ logs, estimatedLogsCount, searchText }: prop) {
   //Contexts
   const { filterCriteria, setFilterCriteria } = useContext(
     FilterCriteriaContext
@@ -56,6 +59,7 @@ export function LogsTable({ logs, estimatedLogsCount }: prop) {
       description: "Container from which log was emitted",
       flex: 0.3,
       sortable: false,
+      filterable: false,
     },
     {
       field: "log",
@@ -65,6 +69,17 @@ export function LogsTable({ logs, estimatedLogsCount }: prop) {
       sortable: false,
       filterable: false,
       resizable: false,
+      renderCell: (params: GridRenderCellParams<any, string>) => {
+        return (
+          <div style={{overflow: "auto"}}>
+            <Highlighter
+              searchWords={[searchText]}
+              textToHighlight={params.value as string}
+              caseSensitive={false}
+            />
+          </div>
+        );
+      },
     },
   ];
 

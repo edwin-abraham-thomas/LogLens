@@ -10,4 +10,4 @@ export interface LogDetails {
   containerName: string;
 }
 
-export type Stream = "stdout" | "stdrr" | "unknown"
+export type Stream = "stdout" | "stdrr"
