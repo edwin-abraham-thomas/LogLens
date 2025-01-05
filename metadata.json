@@ -1,5 +1,11 @@
 {
   "icon": "loglens.svg",
+  "vm": {
+    "composefile": "docker-compose.yaml",
+    "exposes": {
+      "socket": "llbackend.sock"
+    }
+  },
   "ui": {
     "dashboard-tab": {
       "title": "Log Lens",

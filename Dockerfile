@@ -1,17 +1,31 @@
 # syntax=docker/dockerfile:1
-FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS client-builder
+
+# Build ui
+FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS ui-builder
 WORKDIR /ui
 # cache packages in layer
-COPY package.json /ui/package.json
-COPY package-lock.json /ui/package-lock.json
+COPY ui/package.json /ui/package.json
+COPY ui/package-lock.json /ui/package-lock.json
 RUN --mount=type=cache,target=/usr/src/app/.npm \
     npm set cache /usr/src/app/.npm && \
     npm ci
-# install
-COPY . /ui
+COPY /ui/. /ui
 RUN npm run build
 
-FROM alpine
+# Build backend
+FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS backend-builder
+WORKDIR /backend
+# cache packages in layer
+COPY backend/package.json /backend/package.json
+COPY backend/package-lock.json /backend/package-lock.json
+RUN --mount=type=cache,target=/usr/src/backend/.npm \
+    npm set cache /usr/src/backend/.npm && \
+    npm ci
+# Copy files
+COPY backend /backend
+RUN npm run build
+
+FROM --platform=$BUILDPLATFORM node:21.6.0-alpine3.18
 LABEL org.opencontainers.image.title="Log Lens" \
     org.opencontainers.image.description="Filter and view container logs." \
     org.opencontainers.image.vendor="edwinat" \
@@ -25,4 +39,13 @@ LABEL org.opencontainers.image.title="Log Lens" \
     com.docker.extension.categories="utility-tools"
 COPY metadata.json .
 COPY loglens.svg .
-COPY --from=client-builder /ui/build ui
+COPY docker-compose.yaml .
+
+
+# Configure ui
+COPY --from=ui-builder /ui/build ui
+
+# Configure backend
+COPY --from=backend-builder /backend/dist /backend
+COPY --from=backend-builder /backend/node_modules /backend/node_modules
+CMD ["node", "/backend/index.js"]
