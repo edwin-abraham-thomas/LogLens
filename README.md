@@ -35,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Search
 
 
+[2.0.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v2.0.0
 [1.1.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v1.1.0
 [1.0.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v1.0.0
