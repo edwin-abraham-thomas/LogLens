@@ -35,7 +35,7 @@ LABEL org.opencontainers.image.title="Log Lens" \
     com.docker.extension.detailed-description="Dive into logs and gain insights into what is going on inside your containers. View full logs without losing information. Also supports structured JSON logs." \
     com.docker.extension.publisher-url="https://github.com/edwin-abraham-thomas" \
     com.docker.extension.additional-urls="" \
-    com.docker.extension.changelog="<p>Extension changelog<ul><li>Minor update</li></ul></p>" \
+    com.docker.extension.changelog="<p>Extension changelog<ul><li>https://github.com/edwin-abraham-thomas/LogLens?tab=readme-ov-file#changelog</li></ul></p>" \
     com.docker.extension.categories="utility-tools"
 COPY metadata.json .
 COPY loglens.svg .
