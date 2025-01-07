@@ -1,5 +1,15 @@
 import "./styles.css";
-import { Box, IconButton, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  FormControlLabel,
+  IconButton,
+  Modal,
+  Switch,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filter-criteria";
 import { Filter } from "./components/filter/filter";
@@ -39,7 +49,7 @@ export function App() {
     border: "solid",
     borderColor: "secondary.main",
     maxHeight: "80vh",
-    overflow: "auto"
+    overflow: "auto",
   };
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
   const handleFilterModalClose = () => setFilterModalOpen(false);
@@ -83,12 +93,19 @@ export function App() {
               placeholder={"Search"}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <IconButton
-              aria-label="filter"
-              onClick={() => setRefreshEvent(!refreshEvent)}
-            >
-              <RefreshIcon />
-            </IconButton>
+            <Divider orientation="vertical" variant="middle" flexItem />
+            <div>
+              <IconButton
+                aria-label="filter"
+                onClick={() => setRefreshEvent(!refreshEvent)}
+              >
+                <RefreshIcon />
+              </IconButton>
+              <Tooltip title="Auto refresh">
+                <Switch defaultChecked />
+              </Tooltip>
+            </div>
+            <Divider orientation="vertical" variant="middle" flexItem />
             <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
               <FilterList />
             </IconButton>
@@ -101,7 +118,7 @@ export function App() {
             position: "fixed",
             zIndex: 9999,
             paddingTop: "4rem",
-            paddingRight: "3rem"
+            paddingRight: "3rem",
           }}
           className="flex flex-top-right"
           open={filterModalOpen}
