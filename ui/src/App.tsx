@@ -60,6 +60,7 @@ export function App() {
     startupFilterCriteria
   );
   const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
+  let intervalRef: any;
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -102,7 +103,16 @@ export function App() {
                 <RefreshIcon />
               </IconButton>
               <Tooltip title="Auto refresh">
-                <Switch defaultChecked />
+                <Switch
+                  onChange={(event) => {
+                    console.log(event);
+                    if (event.target.checked) {
+                      startInterval(intervalRef, setRefreshEvent, refreshEvent);
+                    } else {
+                      disableAutoRefresh(intervalRef);
+                    }
+                  }}
+                />
               </Tooltip>
             </div>
             <Divider orientation="vertical" variant="middle" flexItem />
@@ -146,5 +156,25 @@ function getInitialFC(): FilterCriteria {
     return presetFilter;
   } else {
     return defaultFilterCriteria;
+  }
+}
+
+function startInterval(
+  intervalId: any,
+  setRefresh: (a: boolean) => void,
+  refreshFlag: boolean
+) {
+  intervalId = setInterval(() => {
+    console.log("refreshing");
+    setRefresh(!refreshFlag);
+  }, 2000);
+
+  console.log("starting interval: ", intervalId);
+}
+
+function disableAutoRefresh(intervalId: any) {
+  if (intervalId) {
+    console.log("clearing interval: ", intervalId);
+    clearInterval(intervalId);
   }
 }
