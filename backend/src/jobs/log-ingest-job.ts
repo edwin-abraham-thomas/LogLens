@@ -11,7 +11,7 @@ export class LogInjestJob {
   constructor() {
     this._dockerClient = Docker.getDockerClient();
     this._logsRepo = new LogsRepository();
-    this._containerExclutionList = ["/loglensbackend", "/loglensdb"]
+    this._containerExclutionList = ["/loglensbackend", "/loglensdb"];
   }
 
   public async start(): Promise<void> {
@@ -19,16 +19,16 @@ export class LogInjestJob {
 
     const containers = await this._dockerClient.listContainers({ all: true });
     containers
-    .filter(
-      (containerInfo: any) =>
-        !this._containerExclutionList.includes(containerInfo.Names[0])
-    )
-    .forEach(async (containerInfo: ContainerInfo) => {
-      console.log(
-        `Found container ${containerInfo.Names[0]}. Looking for logs`
-      );
-      await this.saveContainerLogs(containerInfo.Id, containerInfo);
-    });
+      .filter(
+        (containerInfo: any) =>
+          !this._containerExclutionList.includes(containerInfo.Names[0])
+      )
+      .forEach(async (containerInfo: ContainerInfo) => {
+        console.log(
+          `Found container ${containerInfo.Names[0]}. Looking for logs`
+        );
+        await this.saveContainerLogs(containerInfo.Id, containerInfo);
+      });
 
     this._dockerClient.getEvents().then((stream) => {
       stream.on("data", async (chunk: Buffer) => {
@@ -88,7 +88,13 @@ export class LogInjestJob {
         }
 
         stream.on("data", async (chunk: Buffer) => {
+          console.log(
+            `Processing logs from container: ${containerInfo.Names[0]}`
+          );
           const logs = processLogChunks(chunk);
+          console.log(
+            `Found ${logs?.length} logs from container: ${containerInfo.Names[0]}`
+          );
           const containerName = containerInfo.Names[0].replace(/^\//, "");
           logs.forEach((log) => {
             log.containerId = containerId;
