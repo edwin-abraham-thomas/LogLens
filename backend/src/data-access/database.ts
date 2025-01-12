@@ -81,8 +81,13 @@ export class LogsRepository extends Database {
   }
 
   public async insertLogs(logs: LogDetails[]): Promise<void> {
-    const collection = this.getLogsCollection();
-    await collection.insertMany(logs);
+    if (logs && logs.length > 0) {
+      const collection = this.getLogsCollection();
+      await collection.insertMany(logs);
+      return;
+    }
+
+    console.log("Batch empty skipping db insert");
   }
 
   public async deleteLogs(containerId: string) {
