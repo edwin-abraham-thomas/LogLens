@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { FilterCriteria } from "../../interfaces/filter-criteria";
-import { FilterCriteriaContext } from "../../app";
+import { FilterCriteriaContext } from "../../App";
 import { ContainerStatusIcon } from "../icons/container-status-icon";
 
 export function Filter() {
