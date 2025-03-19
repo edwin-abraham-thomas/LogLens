@@ -9,7 +9,7 @@ import {
   GridRenderCellParams,
   useGridApiRef,
 } from "@mui/x-data-grid";
-import { FilterCriteriaContext } from "../../app";
+import { FilterCriteriaContext } from "../../App";
 import { FilterCriteria } from "../../interfaces/filter-criteria";
 import Highlighter from "react-highlight-words";
 
