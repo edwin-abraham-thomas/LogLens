@@ -68,8 +68,8 @@ export class LogsRepository extends Database {
     const logs = await collection
       .find(query)
       .sort({ orderingKey: -1 })
-      .skip(skip)
-      .limit(limit)
+      .skip(skip > 0 ? skip : 0)
+      .limit(limit > 0 ? limit : 0)
       .toArray();
 
     const count = await collection.countDocuments(query);
