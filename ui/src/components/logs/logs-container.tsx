@@ -12,7 +12,7 @@ type prop = {
 export function LogsContainer({ searchText }: prop) {
   //Contexts
   const { filterCriteria, refreshEvent } = useContext(FilterCriteriaContext);
-  
+
   const [logs, setLogs] = useState<Log[]>([]);
   const [estimatedLogsCount, setEstimatedLogsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,7 +37,9 @@ export function LogsContainer({ searchText }: prop) {
   return (
     <>
       <LogsTable
-        logs={logs.filter((s) => s.log.toLowerCase().includes(searchText.toLowerCase()))}
+        logs={logs.filter((s) =>
+          s.log.toLowerCase().includes(searchText.toLowerCase())
+        )}
         searchText={searchText}
         estimatedLogsCount={estimatedLogsCount}
       />

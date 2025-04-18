@@ -1,5 +1,15 @@
 import "./styles.css";
-import { Box, IconButton, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Modal,
+  TextField,
+  Typography,
+  Switch,
+  Select,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
 import { createContext, useEffect, useState } from "react";
 import { FilterCriteria } from "./interfaces/filter-criteria";
 import { Filter } from "./components/filter/Filter";
@@ -7,6 +17,7 @@ import { FilterList } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { LogsContainer } from "./components/logs/logs-container";
 import { Constants } from "./constants";
+import { AppState } from "./interfaces/app-state";
 
 //#region Context setup
 const defaultFilterCriteria: FilterCriteria = {
@@ -21,7 +32,8 @@ type FCContextType = {
   setFilterCriteria: (filterCriteria: FilterCriteria) => void;
   refreshEvent: boolean;
 };
-const startupFilterCriteria = getInitialFC();
+const appState = getInitialFC();
+const startupFilterCriteria = appState.filterCriteria
 export const FilterCriteriaContext = createContext<FCContextType>({
   filterCriteria: startupFilterCriteria,
   setFilterCriteria: () => {},
@@ -39,7 +51,7 @@ export function App() {
     border: "solid",
     borderColor: "secondary.main",
     maxHeight: "80vh",
-    overflow: "auto"
+    overflow: "auto",
   };
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
   const handleFilterModalClose = () => setFilterModalOpen(false);
@@ -50,6 +62,8 @@ export function App() {
     startupFilterCriteria
   );
   const [refreshEvent, setRefreshEvent] = useState<boolean>(false);
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(appState.autoRefresh);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(appState.autoRefreshInterval);
 
   const [searchText, setSearchText] = useState<string>("");
 
@@ -63,11 +77,27 @@ export function App() {
       return;
     }
     localStorage.setItem(
-      Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY,
-      JSON.stringify(filterCriteria)
+      Constants.APP_STATE_LOCAL_STORAGE_KEY,
+      JSON.stringify({
+        filterCriteria: filterCriteria,
+        autoRefresh: autoRefresh,
+        autoRefreshInterval: autoRefreshInterval,
+      } satisfies AppState)
     );
-  }, [filterCriteria]);
+  }, [filterCriteria, autoRefresh, autoRefreshInterval]);
   //#endregion
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | undefined;
+    if (autoRefresh) {
+      intervalId = setInterval(() => {
+        setRefreshEvent((prev) => !prev);
+      }, autoRefreshInterval);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [autoRefresh, autoRefreshInterval]);
 
   return (
     <>
@@ -83,15 +113,41 @@ export function App() {
               placeholder={"Search"}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <IconButton
-              aria-label="filter"
-              onClick={() => setRefreshEvent(!refreshEvent)}
-            >
-              <RefreshIcon />
-            </IconButton>
-            <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
-              <FilterList />
-            </IconButton>
+            <Tooltip title="Auto refresh">
+              <Switch
+                    checked={autoRefresh}
+                    onChange={(_, checked) => setAutoRefresh(checked)}
+                    color="primary"
+                  />
+            </Tooltip>
+            <Tooltip title="Auto refresh interval" placement="left">
+              <Select
+                value={autoRefreshInterval}
+                onChange={(e) => setAutoRefreshInterval(Number(e.target.value))}
+                size="small"
+                // sx={{ width: 100, ml: 1 }}
+                disabled={!autoRefresh}
+              >
+                <MenuItem value={2000}>2s</MenuItem>
+                <MenuItem value={5000}>5s</MenuItem>
+                <MenuItem value={10000}>10s</MenuItem>
+                <MenuItem value={30000}>30s</MenuItem>
+                <MenuItem value={60000}>60s</MenuItem>
+              </Select>
+            </Tooltip>
+            <Tooltip title="Refresh logs">
+              <IconButton
+                aria-label="filter"
+                onClick={() => setRefreshEvent(!refreshEvent)}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Filter">
+              <IconButton aria-label="filter" onClick={handleFilterModalOpen}>
+                <FilterList />
+              </IconButton>
+            </Tooltip>
           </div>
           <LogsContainer searchText={searchText} />
         </Box>
@@ -101,7 +157,7 @@ export function App() {
             position: "fixed",
             zIndex: 9999,
             paddingTop: "4rem",
-            paddingRight: "3rem"
+            paddingRight: "3rem",
           }}
           className="flex flex-top-right"
           open={filterModalOpen}
@@ -116,18 +172,23 @@ export function App() {
   );
 }
 
-function getInitialFC(): FilterCriteria {
-  const presetFilterCriteriaString = localStorage.getItem(
-    Constants.FILTER_CRITERIA_LOCAL_STORAGE_KEY
+function getInitialFC(): AppState {
+  const presetAppStateString = localStorage.getItem(
+    Constants.APP_STATE_LOCAL_STORAGE_KEY
   );
+
   if (
-    presetFilterCriteriaString !== null &&
-    presetFilterCriteriaString !== "" &&
-    presetFilterCriteriaString !== undefined
+    presetAppStateString === null ||
+    presetAppStateString === "" ||
+    presetAppStateString === undefined
   ) {
-    const presetFilter = JSON.parse(presetFilterCriteriaString);
-    return presetFilter;
+    return {
+      filterCriteria: defaultFilterCriteria,
+      autoRefresh: false,
+      autoRefreshInterval: 5000,
+    };
   } else {
-    return defaultFilterCriteria;
+    const presetFilter = JSON.parse(presetAppStateString);
+    return presetFilter;
   }
 }

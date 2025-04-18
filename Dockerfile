@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build ui
-FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS ui-builder
+FROM --platform=$BUILDPLATFORM node:23.11-alpine AS ui-builder
 WORKDIR /ui
 # cache packages in layer
 COPY ui/package.json /ui/package.json
@@ -13,7 +13,7 @@ COPY /ui/. /ui
 RUN npm run build
 
 # Build backend
-FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS backend-builder
+FROM --platform=$BUILDPLATFORM node:23.11-alpine AS backend-builder
 WORKDIR /backend
 # cache packages in layer
 COPY backend/package.json /backend/package.json
@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/usr/src/backend/.npm \
 COPY backend /backend
 RUN npm run build
 
-FROM --platform=$BUILDPLATFORM node:21.6.0-alpine3.18
+FROM --platform=$BUILDPLATFORM node:23.11-alpine
 LABEL org.opencontainers.image.title="Log Lens" \
     org.opencontainers.image.description="Filter and view container logs." \
     org.opencontainers.image.vendor="edwinat" \
