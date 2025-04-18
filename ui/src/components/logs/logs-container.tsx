@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { FilterCriteriaContext } from "../../app";
+import { FilterCriteriaContext } from "../../App";
 import { Log } from "../../interfaces/log";
 import { LogService } from "../../services/log-service";
 import { LogsTable } from "./logs-table";
