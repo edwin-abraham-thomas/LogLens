@@ -9,37 +9,21 @@ Dive into logs and gain insights into what is going on inside your containers.
 ## Installation
 Go to Docker Desktop -> Extensions tab -> Manage. Search for `Log Lens` and install.
 
-## Changelog
+## Local Development
+To develop LogLens locally, you can use the following Makefile commands:
 
-All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Setup and Installation
+- `make install` - Build the extension locally and install it to Docker Desktop
+- `make update` - Build the extension locally and update an existing installation
 
-### [2.0.1] - 2025-01-10
+### Development with Live Reload
+For UI development with live reload:
+1. Run `npm run dev` to start the local development server
+2. Run `make attach-localhost` to make the extension listen to http://localhost:3000 for UI files
+3. Changes to the UI will be reflected immediately without requiring a rebuild
 
-- Fix log parsing issue blocking backend
+Note: While UI live reload works with this setup, backend changes will still require a rebuild.
 
-### [2.0.0] - 2025-01-05
-
-- Introduced backend and db to handle high volume of logs.
-- UI fixes
-
-### [1.1.0] - 2024-10-27
-
-- Update logs table to use DataGrid to improve usability
-    - Columns can be resized and can be hidden
-    - Logs can be paginated
-- Improve performance when loading large numbers of logs
-
-### [1.0.0] - 2024-10-27
-
-- Stable release
-    - Log viewing
-    - Filter
-    - Search
-
-
-[2.0.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v2.0.0
-[2.0.1]: https://github.com/edwin-abraham-thomas/LogLens/tree/v2.0.1
-[1.1.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v1.1.0
-[1.0.0]: https://github.com/edwin-abraham-thomas/LogLens/tree/v1.0.0
+### Additional Commands
+- `make update-lh` - Update the extension and automatically attach localhost for development
+- `make reset-localhost` - Reset the extension to use the packaged UI files instead of localhost
