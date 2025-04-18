@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added auto-refresh button to refresh logs periodically.
 - Fixed issue with `All` option in `Rows per page` pagination option. (thanks [@mook-as](https://github.com/mook-as))
 - Fixed compiling on case-sensitive file systems (thanks [@mook-as](https://github.com/mook-as))
-- NPM package and docker image updated to reduce vulnarabilities.
+- NPM package and docker image updated to reduce vulnerabilities.
 
 ### [2.0.1] - 2025-01-10
 
