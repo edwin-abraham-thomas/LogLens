@@ -24,6 +24,7 @@ export class LogService {
     const request: GetLogsRequest = {
       containerIds: filter.selectedContainers.map((c) => c.Id),
       streams: streams,
+      filterToLastNMinutes: filter.filterToLastNMinutes,
       page: filter.page,
       pageSize: filter.pageSize,
     };

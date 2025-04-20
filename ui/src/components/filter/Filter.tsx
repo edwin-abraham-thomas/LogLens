@@ -6,6 +6,8 @@ import {
   CardContent,
   Checkbox,
   FormControlLabel,
+  MenuItem,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -64,6 +66,7 @@ export function Filter() {
       </Typography>
 
       <Stack spacing={3}>
+        {additionalFilters(filterCriteria, setFilterCriteria)}
         {containerList(containers, filterCriteria, setFilterCriteria)}
         {logSourceList(filterCriteria, setFilterCriteria)}
       </Stack>
@@ -121,7 +124,6 @@ function containerList(
                       onClick={() => handleContainerSelection(c)}
                       checked={selectedContainerIds.indexOf(c.Id) !== -1}
                       edge="start"
-                      tabIndex={-1}
                       inputProps={{
                         "aria-labelledby": c.Names[0].replace(/^\//, ""),
                       }}
@@ -193,7 +195,6 @@ function logSourceList(
               onClick={() => handleStdoutClick()}
               edge="start"
               checked={selectedlogStreams.stdout}
-              tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stdout" }}
             />
@@ -206,7 +207,6 @@ function logSourceList(
               onClick={() => handleStderrClick()}
               edge="start"
               checked={selectedlogStreams.stderr}
-              tabIndex={-1}
               disableRipple
               inputProps={{ "aria-labelledby": "stderr" }}
             />
@@ -215,5 +215,42 @@ function logSourceList(
         />
       </CardContent>
     </Card>
+  );
+}
+
+function additionalFilters(
+  filterCriteria: FilterCriteria,
+  filterCriteriaUpdate: (filterCriteria: FilterCriteria) => void
+) {
+  const [filterToLastNMinutes, setFilterToLastNMinutes] = useState<number>(
+    filterCriteria.filterToLastNMinutes
+  );
+
+  const handleLastNMinuteSelect = (filterMinutes: Number) => {
+    setFilterToLastNMinutes(filterMinutes.valueOf());
+    const fcUpdate = {
+      ...filterCriteria,
+      filterToLastNMinutes: filterMinutes.valueOf(),
+    };
+    filterCriteriaUpdate(fcUpdate);
+  };
+
+  return (
+    <>
+      <Select
+        value={filterToLastNMinutes}
+        onChange={(e) => handleLastNMinuteSelect(Number(e.target.value))}
+        size="small"
+      >
+        <MenuItem value={15}>Last 15 minutes</MenuItem>
+        <MenuItem value={60}>Last 1 hour</MenuItem>
+        <MenuItem value={240}>Last 4 hours</MenuItem>
+        <MenuItem value={1440}>Last 1 Day</MenuItem>
+        <MenuItem value={2880}>Last 2 Days</MenuItem>
+        <MenuItem value={2880}>Last 3 Days</MenuItem>
+        <MenuItem value={10080}>Last 7 Days</MenuItem>
+        <MenuItem value={-1}>All</MenuItem>
+      </Select>
+    </>
   );
 }

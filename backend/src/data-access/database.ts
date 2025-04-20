@@ -61,10 +61,17 @@ export class LogsRepository extends Database {
     limit: number
   ): Promise<GetLogsResponse> {
     const collection = this.getLogsCollection();
-    const query = {
+    const query: any = {
       containerId: { $in: req.containerIds },
       stream: { $in: req.streams },
     };
+
+    if (req.filterToLastNMinutes > 0) {
+      const currentTime = new Date();
+      const pastTime = new Date(currentTime.getTime() - req.filterToLastNMinutes * 60000);
+      query.timestamp = { $gte: pastTime };
+    }
+
     const logs = await collection
       .find(query)
       .sort({ orderingKey: -1 })

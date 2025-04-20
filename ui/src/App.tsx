@@ -22,6 +22,7 @@ import { AppState } from "./interfaces/app-state";
 //#region Context setup
 const defaultFilterCriteria: FilterCriteria = {
   selectedContainers: [],
+  filterToLastNMinutes: 15,
   stdout: true,
   stderr: true,
   page: Constants.DEFAULT_PAGE,
@@ -155,7 +156,6 @@ export function App() {
         <Modal
           sx={{
             position: "fixed",
-            zIndex: 9999,
             paddingTop: "4rem",
             paddingRight: "3rem",
           }}
