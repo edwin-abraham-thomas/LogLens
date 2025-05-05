@@ -1,4 +1,4 @@
-import { LogInjestJob } from "./jobs/log-ingest-job.js";
+import { LogInjestJob } from "./jobs/log-ingest-job/log-ingest-job.js";
 import { backendApiSocketFile } from "./constants.js";
 import express, { Request, Response } from "express";
 import { LogsRepository } from "./data-access/database.js";
@@ -6,6 +6,7 @@ import fs from "fs";
 import { LogService } from "./services/log-service.js";
 import { GetLogsRequest } from "./models/requests/get-logs-request.js";
 import { GetLogsResponse } from "./models/responses/get-logs-response.js";
+import { LogPurgeJob } from "./jobs/log-purge-job/log-purge-job.js";
 
 async function start() {
   //#region Database init
@@ -14,6 +15,7 @@ async function start() {
 
   //#region Jobs
   new LogInjestJob().start();
+  new LogPurgeJob().start();
   //#endregion
 
   //#region APIs

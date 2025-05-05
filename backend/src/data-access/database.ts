@@ -103,6 +103,27 @@ export class LogsRepository extends Database {
     await collection.deleteMany(filter);
   }
 
+  public async getLogsForNonRunningContainers(runningContainerIds: string[]): Promise<LogDetails[]> {
+    const collection = this.getLogsCollection();
+    const query = {
+      containerId: { $nin: runningContainerIds },
+    };
+
+    const logs = await collection.find(query).toArray();
+    return logs;
+  }
+
+  public async deleteLogsForContainers(containerIds: string[]): Promise<number> {
+    const collection = this.getLogsCollection();
+    const filter = {
+      containerId: { $in: containerIds },
+    };
+
+    const result = await collection.deleteMany(filter);
+    console.log(`Deleted ${result.deletedCount} logs for the specified containers`);
+    return result.deletedCount;
+  }
+
   private getLogsCollection(): Collection<LogDetails> {
     const db = this.getDb();
     return db.collection<LogDetails>(logsCollectionName);
