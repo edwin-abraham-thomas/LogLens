@@ -1,4 +1,4 @@
-import { LogDetails, Stream } from "../models/log-details";
+import { LogDetails, Stream } from "../../models/log-details";
 
 export function processLogChunks(chunk : Buffer): LogDetails[] {
   //   const LOG_HEADER_SIZE = 8;
