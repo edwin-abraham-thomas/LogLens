@@ -1,7 +1,7 @@
 import Dockerode, { ContainerInfo } from "dockerode";
+import { LogsRepository } from "../../data-access/database";
+import { Docker } from "../../dependencies/docker";
 import { processLogChunks } from "./process-log-chunks";
-import { LogsRepository } from "../data-access/database";
-import { Docker } from "../dependencies/docker";
 
 export class LogInjestJob {
   private readonly _dockerClient: Dockerode;
@@ -32,38 +32,45 @@ export class LogInjestJob {
 
     this._dockerClient.getEvents().then((stream) => {
       stream.on("data", async (chunk: Buffer) => {
-        const event = JSON.parse(chunk.toString());
+        try {
+          const event = JSON.parse(chunk.toString());
 
-        if (event.Type !== "container") {
-          return;
-        }
-        const containerStartEvents: string[] = ["start"];
-        if (
-          event.Type === "container" &&
-          containerStartEvents.includes(event.Action)
-        ) {
-          console.log(
-            `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}. Saving logs`
+          if (event.Type !== "container") {
+            return;
+          }
+          const containerStartEvents: string[] = ["start"];
+          if (
+            event.Type === "container" &&
+            containerStartEvents.includes(event.Action)
+          ) {
+            console.log(
+              `Container: ${event.Actor.Attributes.name} start event. ID: ${event.id}. Action: ${event.Action}. Saving logs`
+            );
+            const filter = {
+              filters: {
+                id: [event.id],
+              },
+            };
+            const container = await this._dockerClient.listContainers(filter);
+            await this.saveContainerLogs(event.id, container[0]);
+          }
+
+          const containerStopEvents: string[] = ["destroy"];
+          if (
+            event.Type === "container" &&
+            containerStopEvents.includes(event.Action)
+          ) {
+            console.log(
+              `Container: ${event.Actor.Attributes.name} stop event. ID: ${event.id}. Action: ${event.Action}. Deleting logs`
+            );
+
+            await this.deleteContainerLogs(event.id);
+          }
+        } catch (error) {
+          console.error(
+            `Unhandled error occured while processing event.\nEvent: ${chunk.toString()}\nError: `,
+            error
           );
-          const filter = {
-            filters: {
-              id: [event.id],
-            },
-          };
-          const container = await this._dockerClient.listContainers(filter);
-          await this.saveContainerLogs(event.id, container[0]);
-        }
-
-        const containerStopEvents: string[] = ["destroy"];
-        if (
-          event.Type === "container" &&
-          containerStopEvents.includes(event.Action)
-        ) {
-          console.log(
-            `Container: ${event.Actor.Attributes.name} stop event. ID: ${event.id}. Action: ${event.Action}. Deleting logs`
-          );
-
-          await this.deleteContainerLogs(event.id);
         }
       });
     });
