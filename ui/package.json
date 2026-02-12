@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@docker/docker-mui-theme": "<0.1.0",
-    "@docker/extension-api-client": "0.3.4",
+    "@docker/extension-api-client": "0.4.2",
     "@emotion/react": "11.10.4",
     "@emotion/styled": "11.10.4",
     "@mui/icons-material": "^5.16.7",
@@ -24,7 +24,7 @@
     "reset-localhost": "make reset-localhost"
   },
   "devDependencies": {
-    "@docker/extension-api-client-types": "0.3.4",
+    "@docker/extension-api-client-types": "0.4.2",
     "@types/jest": "^29.1.2",
     "@types/node": "^18.7.18",
     "@types/react": "^18.0.17",
