@@ -11,6 +11,7 @@ export class LogService {
   }
 
   public async getLogs(req: GetLogsRequest): Promise<GetLogsResponse>{
+    console.log("Log search query - ", JSON.stringify(req));
     const skip = (req.page)*req.pageSize;
     const limit = req.pageSize
     console.log("Skip: ", skip, " Limit: ", limit);
