@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build ui
-FROM --platform=$BUILDPLATFORM node:23.11-alpine AS ui-builder
+FROM --platform=$BUILDPLATFORM node:24.13.0-alpine AS ui-builder
 WORKDIR /ui
 # cache packages in layer
 COPY ui/package.json /ui/package.json
@@ -13,7 +13,7 @@ COPY /ui/. /ui
 RUN npm run build
 
 # Build backend
-FROM --platform=$BUILDPLATFORM node:23.11-alpine AS backend-builder
+FROM --platform=$BUILDPLATFORM node:24.13.0-alpine AS backend-builder
 WORKDIR /backend
 # cache packages in layer
 COPY backend/package.json /backend/package.json
@@ -24,8 +24,14 @@ RUN --mount=type=cache,target=/usr/src/backend/.npm \
 # Copy files
 COPY backend /backend
 RUN npm run build
+# Install production dependencies only
+RUN --mount=type=cache,target=/usr/src/backend/.npm \
+    npm set cache /usr/src/backend/.npm && \
+    npm ci --omit=dev
 
-FROM --platform=$BUILDPLATFORM node:23.11-alpine
+FROM --platform=$BUILDPLATFORM node:24.13.0-alpine
+# Upgrade security patches (CVE-2025-69421 - OpenSSL vulnerability)
+RUN apk update && apk upgrade openssl && rm -rf /var/cache/apk/*
 LABEL org.opencontainers.image.title="Log Lens" \
     org.opencontainers.image.description="Filter and view container logs." \
     org.opencontainers.image.vendor="edwinat" \
